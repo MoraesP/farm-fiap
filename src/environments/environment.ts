@@ -1,11 +1,12 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'YOUR_API_KEY',
-    authDomain: 'YOUR_AUTH_DOMAIN',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_STORAGE_BUCKET',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    appId: 'YOUR_APP_ID',
+    apiKey: 'AIzaSyCgvFjZu8mxtx-W1ll0Wnbnhb7ufQyscjw',
+    authDomain: 'farm-fiap.firebaseapp.com',
+    projectId: 'farm-fiap',
+    storageBucket: 'farm-fiap.firebasestorage.app',
+    messagingSenderId: '1046169999343',
+    appId: '1:1046169999343:web:b7416084ad5fa9ab5a881a',
+    measurementId: 'G-N73NG9M8B5',
   },
 };

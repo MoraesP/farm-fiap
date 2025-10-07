@@ -19,9 +19,13 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  loginError = false;
+
   errorMessage = '';
-  isLoading = false;
+  loginError = false;
+
+  carregandoLogin = false;
+  carregandoRegistro = false;
+  carregandoGoogle = false;
 
   constructor(
     private fb: FormBuilder,
@@ -37,12 +41,12 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      this.isLoading = true;
+      this.carregandoLogin = true;
       this.loginError = false;
 
       this.authService.login(email, password).subscribe({
         next: (user) => {
-          this.isLoading = false;
+          this.carregandoLogin = false;
           if (user.email) {
             this.router.navigate(['/home']);
           } else {
@@ -52,7 +56,7 @@ export class LoginComponent {
           }
         },
         error: (error) => {
-          this.isLoading = false;
+          this.carregandoLogin = false;
           this.loginError = true;
 
           if (error instanceof FirebaseError) {
@@ -84,15 +88,61 @@ export class LoginComponent {
     }
   }
 
+  loginWithGoogle(): void {
+    this.carregandoGoogle = true;
+    this.loginError = false;
+
+    this.authService.loginWithGoogle().subscribe({
+      next: (user) => {
+        this.carregandoGoogle = false;
+        if (user.email) {
+          this.router.navigate(['/home']);
+        } else {
+          this.loginError = true;
+          this.errorMessage = 'Falha na autenticação com Google.';
+        }
+      },
+      error: (error) => {
+        this.carregandoGoogle = false;
+        this.loginError = true;
+
+        if (error instanceof FirebaseError) {
+          switch (error.code) {
+            case 'auth/popup-closed-by-user':
+              this.errorMessage = 'Login cancelado. A janela foi fechada.';
+              break;
+            case 'auth/popup-blocked':
+              this.errorMessage =
+                'O popup de login foi bloqueado pelo navegador.';
+              break;
+            case 'auth/cancelled-popup-request':
+              this.errorMessage =
+                'Operação cancelada. Múltiplas solicitações de popup.';
+              break;
+            case 'auth/account-exists-with-different-credential':
+              this.errorMessage =
+                'Uma conta já existe com o mesmo email, mas credenciais diferentes.';
+              break;
+            default:
+              this.errorMessage = `Erro de autenticação com Google: ${error.message}`;
+          }
+        } else {
+          this.errorMessage =
+            'Ocorreu um erro durante o login com Google. Tente novamente.';
+        }
+      },
+    });
+  }
+
   register(): void {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      this.isLoading = true;
+      this.carregandoRegistro = true;
       this.loginError = false;
 
       this.authService.register(email, password).subscribe({
         next: (user) => {
-          this.isLoading = false;
+          this.carregandoRegistro = false;
           if (user.email) {
             this.router.navigate(['/home']);
           } else {
@@ -101,7 +151,7 @@ export class LoginComponent {
           }
         },
         error: (error) => {
-          this.isLoading = false;
+          this.carregandoRegistro = false;
           this.loginError = true;
 
           if (error instanceof FirebaseError) {
@@ -128,5 +178,9 @@ export class LoginComponent {
     } else {
       this.loginForm.markAllAsTouched();
     }
+  }
+
+  get desabilitado() {
+    return this.carregandoLogin || this.carregandoRegistro || this.carregandoGoogle;
   }
 }

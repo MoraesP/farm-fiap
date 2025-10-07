@@ -17,7 +17,12 @@ export class HomeComponent {
 
   get userName(): string {
     const user = this.authService.getCurrentUser();
-    return user?.email || 'Usuário';
+    return user?.displayName || user?.email || 'Usuário';
+  }
+
+  get userPhotoURL(): string | null {
+    const user = this.authService.getCurrentUser();
+    return user?.photoURL || null;
   }
 
   logout(): void {

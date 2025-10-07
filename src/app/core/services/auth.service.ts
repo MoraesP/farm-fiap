@@ -1,9 +1,11 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import {
   User as FirebaseUser,
+  GoogleAuthProvider,
   UserCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { BehaviorSubject, Observable, from } from 'rxjs';
@@ -14,6 +16,7 @@ interface User {
   email: string;
   uid: string;
   displayName?: string;
+  photoURL?: string;
 }
 
 @Injectable({
@@ -60,6 +63,7 @@ export class AuthService implements OnDestroy {
       email: firebaseUser.email || '',
       uid: firebaseUser.uid,
       displayName: firebaseUser.displayName || undefined,
+      photoURL: firebaseUser.photoURL || undefined,
     };
   }
 
@@ -76,6 +80,30 @@ export class AuthService implements OnDestroy {
       }),
       catchError((error) => {
         console.error('Erro no login:', error);
+        throw error;
+      })
+    );
+  }
+
+  loginWithGoogle(): Observable<User> {
+    const auth = this.firebaseService.getAuth();
+    const googleProvider = this.firebaseService.getGoogleProvider();
+
+    return from(signInWithPopup(auth, googleProvider)).pipe(
+      map((result) => {
+        // O token de acesso pode ser usado para acessar a API do Google
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+
+        // Informações do usuário
+        const user = this.mapFirebaseUser(result.user);
+        if (!user) {
+          throw new Error('Falha na autenticação com Google');
+        }
+        return user;
+      }),
+      catchError((error) => {
+        console.error('Erro no login com Google:', error);
         throw error;
       })
     );
