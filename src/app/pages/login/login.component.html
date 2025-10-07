@@ -60,19 +60,35 @@
       </div>
 
       <div class="alert alert-danger" *ngIf="loginError">
-        Credenciais inválidas. Por favor, tente novamente.
+        {{ errorMessage }}
       </div>
 
       <button
         type="submit"
         class="btn btn-primary w-100"
-        [disabled]="loginForm.invalid"
+        [disabled]="loginForm.invalid || isLoading"
       >
+        <span
+          *ngIf="isLoading"
+          class="spinner-border spinner-border-sm me-2"
+          role="status"
+          aria-hidden="true"
+        ></span>
         Entrar
       </button>
     </form>
     <hr class="my-3" />
-    <button class="btn btn-success w-100" (click)="register()">
+    <button
+      class="btn btn-success w-100"
+      (click)="register()"
+      [disabled]="loginForm.invalid || isLoading"
+    >
+      <span
+        *ngIf="isLoading"
+        class="spinner-border spinner-border-sm me-2"
+        role="status"
+        aria-hidden="true"
+      ></span>
       Registrar
     </button>
   </div>

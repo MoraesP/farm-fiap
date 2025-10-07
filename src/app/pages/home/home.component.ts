@@ -11,6 +11,8 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent {
+  isLoggingOut = false;
+
   constructor(private authService: AuthService, private router: Router) {}
 
   get userName(): string {
@@ -19,7 +21,16 @@ export class HomeComponent {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.isLoggingOut = true;
+    this.authService.logout().subscribe({
+      next: () => {
+        this.isLoggingOut = false;
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        console.error('Erro ao fazer logout:', error);
+        this.isLoggingOut = false;
+      },
+    });
   }
 }
