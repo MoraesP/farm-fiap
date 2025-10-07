@@ -1,0 +1,11 @@
+.sidebar-container {
+  height: 100%;
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}

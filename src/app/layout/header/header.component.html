@@ -1,0 +1,30 @@
+<nav class="navbar navbar-expand navbar-light bg-white shadow-sm">
+  <div class="container-fluid">
+    <!-- Espaçador para empurrar o conteúdo para a direita -->
+    <div class="flex-grow-1"></div>
+
+    <!-- Conteúdo do usuário -->
+    <div class="d-flex align-items-center">
+      <div class="me-3 text-end">
+        <div class="fw-bold">{{ userState.name }}</div>
+        <small class="text-muted">Cooperado</small>
+      </div>
+      <img
+        [src]="
+          userState.usuarioAtual?.photoURL || 'assets/images/default-avatar.png'
+        "
+        alt="Foto do usuário"
+        class="rounded-circle"
+        width="40"
+        height="40"
+      />
+      <button
+        class="btn btn-link text-danger ms-2"
+        (click)="logout()"
+        [disabled]="isLoggingOut"
+      >
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </div>
+</nav>
