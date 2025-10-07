@@ -1,7 +1,13 @@
 <div class="app-container">
   <app-header class="app-header"></app-header>
-  <app-sidebar class="app-sidebar"></app-sidebar>
+  <app-sidebar
+    class="app-sidebar"
+    (navegarEvent)="onNavegar($event)"
+  ></app-sidebar>
   <main class="app-content">
-    <router-outlet></router-outlet>
+    <div [ngSwitch]="moduloAtual">
+      <app-home *ngSwitchCase="'home'"></app-home>
+      <app-produtos *ngSwitchCase="'produtos'"></app-produtos>
+    </div>
   </main>
 </div>

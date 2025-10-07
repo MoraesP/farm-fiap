@@ -4,22 +4,9 @@ import { loginGuard } from './core/guards/login.guard';
 
 export const routes: Routes = [
   {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
-  },
-  {
-    path: 'home',
+    path: 'app',
     loadComponent: () =>
       import('./layout/layout.component').then((m) => m.LayoutComponent),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'produtos',
-    loadComponent: () =>
-      import('./pages/produtos/produtos.component').then(
-        (m) => m.ProdutosComponent
-      ),
     canActivate: [authGuard],
   },
   {
@@ -36,15 +23,6 @@ export const routes: Routes = [
       ),
     canActivate: [loginGuard],
   },
-  {
-    path: '404',
-    loadComponent: () =>
-      import('./pages/not-found/not-found.component').then(
-        (m) => m.NotFoundComponent
-      ),
-  },
-  {
-    path: '**',
-    redirectTo: '404',
-  },
+  { path: '', redirectTo: '/app', pathMatch: 'full' },
+  { path: '**', redirectTo: '/app' },
 ];

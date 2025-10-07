@@ -6,9 +6,10 @@
   <ul class="nav nav-pills flex-column mb-auto p-2">
     <li class="nav-item" *ngFor="let item of menuItems">
       <a
-        [routerLink]="item.path"
-        routerLinkActive="active"
+        (click)="navegar(item.id)"
+        [class.active]="moduloAtivo === item.id"
         class="nav-link text-white"
+        style="cursor: pointer"
       >
         <i class="fas {{ item.icon }} me-2"></i>
         {{ item.title }}
