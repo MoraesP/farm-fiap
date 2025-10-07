@@ -1,0 +1,71 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2 class="login-title">Login</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+          "
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+          "
+        >
+          <span *ngIf="loginForm.get('email')?.errors?.['required']"
+            >Email é obrigatório.</span
+          >
+          <span *ngIf="loginForm.get('email')?.errors?.['email']"
+            >Formato de email inválido.</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.is-invalid]="
+            loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched
+          "
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched
+          "
+        >
+          <span *ngIf="loginForm.get('password')?.errors?.['required']"
+            >Senha é obrigatória.</span
+          >
+          <span *ngIf="loginForm.get('password')?.errors?.['minlength']"
+            >A senha deve ter pelo menos 6 caracteres.</span
+          >
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="loginError">
+        Credenciais inválidas. Por favor, tente novamente.
+      </div>
+
+      <button type="submit" class="login-button" [disabled]="loginForm.invalid">
+        Entrar
+      </button>
+    </form>
+    <div class="separator"></div>
+    <button class="login-button register" (click)="register()">Registrar</button>
+  </div>
+</div>
