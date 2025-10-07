@@ -1,10 +1,12 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2 class="login-title">Login</h2>
+<div
+  class="d-flex justify-content-center align-items-center min-vh-100 bg-light"
+>
+  <div class="card shadow p-4 w-100" style="max-width: 400px">
+    <h2 class="text-center mb-4">Login</h2>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="form-group">
-        <label for="email">Email</label>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
         <input
           type="email"
           id="email"
@@ -15,7 +17,7 @@
           "
         />
         <div
-          class="error-message"
+          class="invalid-feedback"
           *ngIf="
             loginForm.get('email')?.invalid && loginForm.get('email')?.touched
           "
@@ -29,8 +31,8 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="password">Senha</label>
+      <div class="mb-3">
+        <label for="password" class="form-label">Senha</label>
         <input
           type="password"
           id="password"
@@ -42,7 +44,7 @@
           "
         />
         <div
-          class="error-message"
+          class="invalid-feedback"
           *ngIf="
             loginForm.get('password')?.invalid &&
             loginForm.get('password')?.touched
@@ -57,15 +59,21 @@
         </div>
       </div>
 
-      <div class="error-message" *ngIf="loginError">
+      <div class="alert alert-danger" *ngIf="loginError">
         Credenciais inválidas. Por favor, tente novamente.
       </div>
 
-      <button type="submit" class="login-button" [disabled]="loginForm.invalid">
+      <button
+        type="submit"
+        class="btn btn-primary w-100"
+        [disabled]="loginForm.invalid"
+      >
         Entrar
       </button>
     </form>
-    <div class="separator"></div>
-    <button class="login-button register" (click)="register()">Registrar</button>
+    <hr class="my-3" />
+    <button class="btn btn-success w-100" (click)="register()">
+      Registrar
+    </button>
   </div>
 </div>

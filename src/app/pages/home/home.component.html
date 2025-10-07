@@ -1,14 +1,24 @@
-<div class="home-container">
-  <header class="header">
-    <h1>Farm FIAP</h1>
-    <div class="user-info">
-      <span>Bem-vindo, {{ userName }}</span>
-      <button class="logout-button" (click)="logout()">Sair</button>
+<div class="d-flex flex-column min-vh-100">
+  <header class="bg-primary text-white p-3 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <h1 class="m-0 fs-4">Farm FIAP</h1>
+      <div class="d-flex align-items-center gap-3">
+        <span>Bem-vindo, {{ userName }}</span>
+        <button class="btn btn-outline-light btn-sm" (click)="logout()">Sair</button>
+      </div>
     </div>
   </header>
 
-  <main class="content">
-    <h2>Página Inicial</h2>
-    <p>Esta é a página inicial da aplicação. Você está autenticado.</p>
+  <main class="container py-4 flex-grow-1">
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="card-title">Página Inicial</h2>
+            <p class="card-text">Esta é a página inicial da aplicação. Você está autenticado.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
