@@ -24,7 +24,6 @@ export class LoginComponent {
   loginError = false;
 
   carregandoLogin = false;
-  carregandoRegistro = false;
   carregandoGoogle = false;
 
   constructor(
@@ -47,7 +46,7 @@ export class LoginComponent {
       this.authService.login(email, password).subscribe({
         next: (user) => {
           this.carregandoLogin = false;
-          if (user.email) {
+          if (user?.email) {
             this.router.navigate(['/home']);
           } else {
             this.loginError = true;
@@ -135,52 +134,12 @@ export class LoginComponent {
   }
 
   register(): void {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-      this.carregandoRegistro = true;
-      this.loginError = false;
-
-      this.authService.register(email, password).subscribe({
-        next: (user) => {
-          this.carregandoRegistro = false;
-          if (user.email) {
-            this.router.navigate(['/home']);
-          } else {
-            this.loginError = true;
-            this.errorMessage = 'Falha no registro. Tente novamente.';
-          }
-        },
-        error: (error) => {
-          this.carregandoRegistro = false;
-          this.loginError = true;
-
-          if (error instanceof FirebaseError) {
-            switch (error.code) {
-              case 'auth/email-already-in-use':
-                this.errorMessage = 'Este email já está em uso.';
-                break;
-              case 'auth/invalid-email':
-                this.errorMessage = 'Email inválido.';
-                break;
-              case 'auth/weak-password':
-                this.errorMessage =
-                  'Senha muito fraca. Use pelo menos 6 caracteres.';
-                break;
-              default:
-                this.errorMessage = `Erro no registro: ${error.message}`;
-            }
-          } else {
-            this.errorMessage =
-              'Ocorreu um erro durante o registro. Tente novamente.';
-          }
-        },
-      });
-    } else {
-      this.loginForm.markAllAsTouched();
-    }
+    this.router.navigate(['/register']);
   }
 
   get desabilitado() {
-    return this.carregandoLogin || this.carregandoRegistro || this.carregandoGoogle;
+    return (
+      this.carregandoLogin || this.carregandoGoogle
+    );
   }
 }

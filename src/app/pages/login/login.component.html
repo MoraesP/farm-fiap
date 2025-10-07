@@ -90,7 +90,7 @@
       [disabled]="desabilitado"
     >
       <span
-        *ngIf="carregandoRegistro"
+        *ngIf="carregandoGoogle"
         class="spinner-border spinner-border-sm me-2"
         role="status"
         aria-hidden="true"
@@ -114,14 +114,8 @@
     <button
       class="btn btn-success w-100"
       (click)="register()"
-      [disabled]="loginForm.invalid || desabilitado"
+      [disabled]="desabilitado"
     >
-      <span
-        *ngIf="carregandoRegistro"
-        class="spinner-border spinner-border-sm me-2"
-        role="status"
-        aria-hidden="true"
-      ></span>
       Registrar
     </button>
   </div>

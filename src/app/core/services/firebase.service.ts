@@ -7,6 +7,14 @@ import {
   onAuthStateChanged,
   User,
 } from 'firebase/auth';
+import {
+  collection,
+  CollectionReference,
+  doc,
+  DocumentReference,
+  Firestore,
+  getFirestore,
+} from 'firebase/firestore';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -15,20 +23,18 @@ import { environment } from '../../../environments/environment';
 export class FirebaseService {
   private auth: Auth;
   private googleProvider: GoogleAuthProvider;
+  private firestore: Firestore;
 
   constructor() {
-    // Inicializa o Firebase
     const app = initializeApp(environment.firebase);
-
-    // Obtém a instância de autenticação
     this.auth = getAuth(app);
 
-    // Inicializa o provedor do Google
     this.googleProvider = new GoogleAuthProvider();
-    // Configurações opcionais para o provedor do Google
     this.googleProvider.setCustomParameters({
       prompt: 'select_account',
     });
+
+    this.firestore = getFirestore(app);
   }
 
   /**
@@ -43,6 +49,30 @@ export class FirebaseService {
    */
   getGoogleProvider(): GoogleAuthProvider {
     return this.googleProvider;
+  }
+
+  /**
+   * Retorna a instância do Firestore
+   */
+  getFirestore(): Firestore {
+    return this.firestore;
+  }
+
+  /**
+   * Obtém uma referência para uma coleção no Firestore
+   * @param collectionPath Caminho para a coleção
+   */
+  getCollection(collectionPath: string): CollectionReference {
+    return collection(this.firestore, collectionPath);
+  }
+
+  /**
+   * Obtém uma referência para um documento no Firestore
+   * @param collectionPath Caminho para a coleção
+   * @param docId ID do documento
+   */
+  getDocRef(collectionPath: string, docId: string): DocumentReference {
+    return doc(this.firestore, collectionPath, docId);
   }
 
   /**
