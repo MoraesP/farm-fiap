@@ -5,63 +5,35 @@
     <h2 class="text-center mb-4">Cadastro</h2>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <!-- Nome e Sobrenome -->
       <div class="row">
-        <!-- Nome -->
         <div class="col-md-6 mb-3">
-          <label for="firstName" class="form-label">Nome</label>
+          <label for="primeiroNome" class="form-label">Nome</label>
           <input
             type="text"
-            id="firstName"
-            formControlName="firstName"
+            id="primeiroNome"
+            formControlName="primeiroNome"
             class="form-control"
             [class.is-invalid]="
-              registerForm.get('firstName')?.invalid &&
-              registerForm.get('firstName')?.touched
+              registerForm.get('primeiroNome')?.invalid &&
+              registerForm.get('primeiroNome')?.touched
             "
           />
-          <div
-            class="invalid-feedback"
-            *ngIf="
-              registerForm.get('firstName')?.invalid &&
-              registerForm.get('firstName')?.touched
-            "
-          >
-            <span *ngIf="registerForm.get('firstName')?.errors?.['required']">
-              Nome é obrigatório.
-            </span>
-            <span *ngIf="registerForm.get('firstName')?.errors?.['minlength']">
-              Nome deve ter pelo menos 2 caracteres.
-            </span>
-          </div>
+          <!-- Mensagens de erro -->
         </div>
-
-        <!-- Sobrenome -->
         <div class="col-md-6 mb-3">
-          <label for="lastName" class="form-label">Sobrenome</label>
+          <label for="ultimoNome" class="form-label">Sobrenome</label>
           <input
             type="text"
-            id="lastName"
-            formControlName="lastName"
+            id="ultimoNome"
+            formControlName="ultimoNome"
             class="form-control"
             [class.is-invalid]="
-              registerForm.get('lastName')?.invalid &&
-              registerForm.get('lastName')?.touched
+              registerForm.get('ultimoNome')?.invalid &&
+              registerForm.get('ultimoNome')?.touched
             "
           />
-          <div
-            class="invalid-feedback"
-            *ngIf="
-              registerForm.get('lastName')?.invalid &&
-              registerForm.get('lastName')?.touched
-            "
-          >
-            <span *ngIf="registerForm.get('lastName')?.errors?.['required']">
-              Sobrenome é obrigatório.
-            </span>
-            <span *ngIf="registerForm.get('lastName')?.errors?.['minlength']">
-              Sobrenome deve ter pelo menos 2 caracteres.
-            </span>
-          </div>
+          <!-- Mensagens de erro -->
         </div>
       </div>
 
@@ -78,24 +50,11 @@
             registerForm.get('email')?.touched
           "
         />
-        <div
-          class="invalid-feedback"
-          *ngIf="
-            registerForm.get('email')?.invalid &&
-            registerForm.get('email')?.touched
-          "
-        >
-          <span *ngIf="registerForm.get('email')?.errors?.['required']">
-            Email é obrigatório.
-          </span>
-          <span *ngIf="registerForm.get('email')?.errors?.['email']">
-            Formato de email inválido.
-          </span>
-        </div>
+        <!-- Mensagens de erro -->
       </div>
 
+      <!-- CPF e Data de Nascimento -->
       <div class="row">
-        <!-- CPF -->
         <div class="col-md-6 mb-3">
           <label for="cpf" class="form-label">CPF</label>
           <input
@@ -109,126 +68,86 @@
               registerForm.get('cpf')?.touched
             "
           />
-          <div
-            class="invalid-feedback"
-            *ngIf="
-              registerForm.get('cpf')?.invalid &&
-              registerForm.get('cpf')?.touched
-            "
-          >
-            <span *ngIf="registerForm.get('cpf')?.errors?.['required']">
-              CPF é obrigatório.
-            </span>
-            <span *ngIf="registerForm.get('cpf')?.errors?.['invalidCpf']">
-              CPF inválido.
-            </span>
-          </div>
+          <!-- Mensagens de erro -->
         </div>
-
-        <!-- Data de Nascimento -->
         <div class="col-md-6 mb-3">
-          <label for="birthDate" class="form-label">Data de Nascimento</label>
+          <label for="dataNascimento" class="form-label"
+            >Data de Nascimento</label
+          >
           <input
             type="date"
-            id="birthDate"
-            formControlName="birthDate"
+            id="dataNascimento"
+            formControlName="dataNascimento"
             class="form-control"
             [class.is-invalid]="
-              registerForm.get('birthDate')?.invalid &&
-              registerForm.get('birthDate')?.touched
+              registerForm.get('dataNascimento')?.invalid &&
+              registerForm.get('dataNascimento')?.touched
             "
           />
-          <div
-            class="invalid-feedback"
-            *ngIf="
-              registerForm.get('birthDate')?.invalid &&
-              registerForm.get('birthDate')?.touched
+          <!-- Mensagens de erro -->
+        </div>
+      </div>
+
+      <!-- Perfil e Fazenda -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="perfil" class="form-label">Eu sou</label>
+          <select id="perfil" formControlName="perfil" class="form-select">
+            <option *ngFor="let perfil of perfis" [value]="perfil">
+              {{ getPerfilNome(perfil) }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6 mb-3" *ngIf="eCooperado">
+          <label for="fazenda" class="form-label">Minha Fazenda</label>
+          <select
+            id="fazenda"
+            formControlName="fazenda"
+            class="form-select"
+            [class.is-invalid]="
+              registerForm.get('fazenda')?.invalid &&
+              registerForm.get('fazenda')?.touched
             "
           >
-            <span *ngIf="registerForm.get('birthDate')?.errors?.['required']">
-              Data de nascimento é obrigatória.
-            </span>
-            <span
-              *ngIf="registerForm.get('birthDate')?.errors?.['invalidDate']"
-            >
-              Data de nascimento inválida.
-            </span>
-            <span *ngIf="registerForm.get('birthDate')?.errors?.['futureDate']">
-              Data de nascimento não pode ser no futuro.
-            </span>
-            <span *ngIf="registerForm.get('birthDate')?.errors?.['minAge']">
-              Você deve ter pelo menos 18 anos.
-            </span>
+            <option [ngValue]="null" disabled>Selecione uma fazenda</option>
+            <option *ngFor="let fazenda of fazendas" [ngValue]="fazenda">
+              {{ fazenda.nome }}
+            </option>
+          </select>
+          <div
+            class="invalid-feedback"
+            *ngIf="registerForm.get('fazenda')?.errors?.['required']"
+          >
+            Por favor, selecione sua fazenda.
           </div>
         </div>
       </div>
 
-      <!-- Senha -->
-      <div class="mb-3">
-        <label for="password" class="form-label">Senha</label>
-        <input
-          type="password"
-          id="password"
-          formControlName="password"
-          class="form-control"
-          [class.is-invalid]="
-            registerForm.get('password')?.invalid &&
-            registerForm.get('password')?.touched
-          "
-        />
-        <div
-          class="invalid-feedback"
-          *ngIf="
-            registerForm.get('password')?.invalid &&
-            registerForm.get('password')?.touched
-          "
-        >
-          <span *ngIf="registerForm.get('password')?.errors?.['required']">
-            Senha é obrigatória.
-          </span>
-          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">
-            A senha deve ter pelo menos 6 caracteres.
-          </span>
+      <!-- Senha e Confirmação -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="password" class="form-label">Senha</label>
+          <input
+            [type]="passwordVisible ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+          />
         </div>
-      </div>
-
-      <!-- Confirmação de Senha -->
-      <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Confirmar Senha</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          formControlName="confirmPassword"
-          class="form-control"
-          [class.is-invalid]="
-            (registerForm.get('confirmPassword')?.invalid ||
-              registerForm.errors?.['passwordMismatch']) &&
-            registerForm.get('confirmPassword')?.touched
-          "
-        />
-        <div
-          class="invalid-feedback"
-          *ngIf="
-            (registerForm.get('confirmPassword')?.invalid ||
-              registerForm.errors?.['passwordMismatch']) &&
-            registerForm.get('confirmPassword')?.touched
-          "
-        >
-          <span
-            *ngIf="registerForm.get('confirmPassword')?.errors?.['required']"
+        <div class="col-md-6 mb-3">
+          <label for="confirmPassword" class="form-label"
+            >Confirmar Senha</label
           >
-            Confirmação de senha é obrigatória.
-          </span>
-          <span *ngIf="registerForm.errors?.['passwordMismatch']">
-            As senhas não coincidem.
-          </span>
+          <input
+            [type]="confirmPasswordVisible ? 'text' : 'password'"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            class="form-control"
+          />
         </div>
       </div>
 
-      <div class="alert alert-danger" *ngIf="registerError">
-        {{ errorMessage }}
-      </div>
-
+      <!-- Botão de cadastro e Link para Login -->
       <button
         type="submit"
         class="btn btn-primary w-100 mb-3"
@@ -237,19 +156,13 @@
         <span
           *ngIf="isLoading"
           class="spinner-border spinner-border-sm me-2"
-          role="status"
-          aria-hidden="true"
         ></span>
         Cadastrar
       </button>
-
       <div class="text-center">
         <p>
           Já tem uma conta?
-          <a
-            href="javascript:void(0)"
-            (click)="goToLogin()"
-            class="text-primary"
+          <a (click)="goToLogin()" style="cursor: pointer" class="text-primary"
             >Faça login</a
           >
         </p>

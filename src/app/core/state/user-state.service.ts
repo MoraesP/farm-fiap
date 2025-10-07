@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { doc, setDoc } from 'firebase/firestore';
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserProfile } from '../models/user.model';
+import { PerfilUsuario } from '../models/user.model';
 import { FirebaseService } from '../services/firebase.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserStateService {
-  private usuarioAtualSubject = new BehaviorSubject<UserProfile | null>(null);
+  private usuarioAtualSubject = new BehaviorSubject<PerfilUsuario | null>(null);
   private precisaAtualizarPerfilSubject = new BehaviorSubject<boolean>(false);
-  private usuarioPerfilGoogle: UserProfile | null = null;
+  private usuarioPerfilGoogle: PerfilUsuario | null = null;
 
   public usuarioAtual$ = this.usuarioAtualSubject.asObservable();
 
@@ -21,22 +21,22 @@ export class UserStateService {
   constructor(private firebaseService: FirebaseService) {
     const usuarioSalvo = localStorage.getItem('currentUser');
     if (usuarioSalvo) {
-      const user = JSON.parse(usuarioSalvo) as UserProfile;
-      if (this.estaComPerfilCompleto(user)) {
-        this.usuarioAtualSubject.next(user);
+      const usuario = JSON.parse(usuarioSalvo) as PerfilUsuario;
+      if (this.estaComPerfilCompleto(usuario)) {
+        this.usuarioAtualSubject.next(usuario);
       }
     }
   }
 
-  definirUsuarioAutenticado(user: UserProfile): void {
-    this.usuarioAtualSubject.next(user);
-    localStorage.setItem('currentUser', JSON.stringify(user));
+  definirUsuarioAutenticado(usuario: PerfilUsuario): void {
+    this.usuarioAtualSubject.next(usuario);
+    localStorage.setItem('currentUser', JSON.stringify(usuario));
     this.precisaAtualizarPerfilSubject.next(false);
     this.usuarioPerfilGoogle = null;
   }
 
-  comecarCompletandoPerfil(user: UserProfile): void {
-    this.usuarioPerfilGoogle = user;
+  comecarCompletandoPerfil(usuario: PerfilUsuario): void {
+    this.usuarioPerfilGoogle = usuario;
     this.precisaAtualizarPerfilSubject.next(true);
     this.usuarioAtualSubject.next(null);
     localStorage.removeItem('currentUser');
@@ -54,10 +54,10 @@ export class UserStateService {
     this.precisaAtualizarPerfilSubject.next(false);
   }
 
-  completarPerfilUsuario(profileData: {
+  completarPerfilUsuario(perfilData: {
     cpf: string;
-    birthDate: string;
-  }): Observable<UserProfile> {
+    dataNascimento: string;
+  }): Observable<PerfilUsuario> {
     if (!this.usuarioPerfilGoogle) {
       throw new Error('Nenhum usuário temporário para completar o perfil.');
     }
@@ -65,9 +65,9 @@ export class UserStateService {
     const firestore = this.firebaseService.getFirestore();
     const userDocRef = doc(firestore, 'users', this.usuarioPerfilGoogle.uid);
 
-    const updatedProfile: UserProfile = {
+    const updatedProfile: PerfilUsuario = {
       ...this.usuarioPerfilGoogle,
-      ...profileData,
+      ...perfilData,
       updatedAt: new Date(),
     };
 
@@ -79,25 +79,28 @@ export class UserStateService {
     );
   }
 
-  estaComPerfilCompleto(profile: UserProfile | null): boolean {
-    if (!profile) {
+  estaComPerfilCompleto(perfilUsuario: PerfilUsuario | null): boolean {
+    if (!perfilUsuario) {
       return false;
     }
-    return !!(profile.cpf && profile.birthDate);
+    return !!(perfilUsuario.cpf && perfilUsuario.dataNascimento);
   }
 
-  get usuarioAtual(): UserProfile | null {
+  get usuarioAtual(): PerfilUsuario | null {
     return this.usuarioAtualSubject.value;
   }
 
-  get usuarioGoogle(): UserProfile | null {
+  get usuarioGoogle(): PerfilUsuario | null {
     return this.usuarioPerfilGoogle;
   }
 
-  get name(): string {
-    const user = this.usuarioAtualSubject.value;
-    if (!user) return '';
-    return `${user.firstName} ${user.lastName}`.trim() || user.email;
+  get nomeUsuario(): string {
+    if (!this.usuarioAtual) {
+      return '';
+    };
+    return (
+      `${this.usuarioAtual.primeiroNome} ${this.usuarioAtual.ultimoNome}`.trim() || this.usuarioAtual.email
+    );
   }
 
   get estaLogado(): boolean {

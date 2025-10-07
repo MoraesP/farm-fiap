@@ -9,10 +9,10 @@ import {
 import { Router } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { Subscription } from 'rxjs';
-import { UserProfile } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserStateService } from '../../core/state/user-state.service';
 import { CompleteProfileModalComponent } from '../../shared/components/complete-profile-modal/complete-profile-modal.component';
+import { PerfilUsuario } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // Estado do modal
   showCompleteProfileModal = false;
-  tempUserForModal: UserProfile | null = null;
+  perfilUsuarioTemp: PerfilUsuario | null = null;
   private subscriptions = new Subscription();
 
   constructor(
@@ -51,7 +51,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.userState.precisaAtualizarPerfil$.subscribe((completarPerfil) => {
         this.showCompleteProfileModal = completarPerfil;
         if (completarPerfil) {
-          this.tempUserForModal = this.userState.usuarioGoogle;
+          this.perfilUsuarioTemp = this.userState.usuarioGoogle;
         }
       })
     );
@@ -94,8 +94,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleCompleteProfile(profileData: { cpf: string; birthDate: string }): void {
-    this.userState.completarPerfilUsuario(profileData).subscribe({
+  handleCompleteProfile(perfilData: { cpf: string; dataNascimento: string }): void {
+    this.userState.completarPerfilUsuario(perfilData).subscribe({
       error: (error) => this.handleAuthError(error),
     });
   }

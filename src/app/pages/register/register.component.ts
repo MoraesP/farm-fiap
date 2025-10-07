@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -10,7 +10,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FirebaseError } from 'firebase/app';
+import { Fazenda, Perfil } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -20,26 +20,43 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   registerError = false;
   errorMessage = '';
   isLoading = false;
 
+  passwordVisible = false;
+  confirmPasswordVisible = false;
+  // Expor o enum e a lista para o template
+  perfis = Object.values(Perfil);
+
+  fazendas: Fazenda[] = [
+    { nome: 'Fazenda Santa Clara', cnpj: '11.111.111/0001-11' },
+    { nome: 'Fazenda Boa Esperança', cnpj: '22.222.222/0001-22' },
+    { nome: 'Fazenda Sol Nascente', cnpj: '33.333.333/0001-33' },
+  ];
+
   private readonly IDADE_MINIMA = 18;
 
   constructor(
+    private router: Router,
     private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {
     this.registerForm = this.fb.group(
       {
-        firstName: ['', [Validators.required, Validators.minLength(2)]],
-        lastName: ['', [Validators.required, Validators.minLength(2)]],
+        primeiroNome: ['', [Validators.required, Validators.minLength(2)]],
+        ultimoNome: ['', [Validators.required, Validators.minLength(2)]],
         email: ['', [Validators.required, Validators.email]],
         cpf: ['', [Validators.required, this.cpfValidator()]],
-        birthDate: ['', [Validators.required, this.birthDateValidator()]],
+        dataNascimento: [
+          '',
+          [Validators.required, this.dataNascimentoValidator()],
+        ],
+        perfil: [Perfil.COOPERADO, Validators.required],
+        fazenda: [null], // Começa nulo
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]],
       },
@@ -49,53 +66,57 @@ export class RegisterComponent {
     );
   }
 
+  ngOnInit(): void {
+    this.onPerfilChange();
+  }
+
+  onPerfilChange(): void {
+    this.registerForm.get('perfil')?.valueChanges.subscribe((perfil) => {
+      const fazendaControl = this.registerForm.get('fazenda');
+      if (perfil === Perfil.COOPERADO) {
+        fazendaControl?.setValidators([Validators.required]);
+      } else {
+        fazendaControl?.clearValidators();
+        fazendaControl?.setValue(null);
+      }
+      fazendaControl?.updateValueAndValidity();
+      this.cdr.detectChanges(); // Forçar detecção de mudanças
+    });
+  }
+
+  get eCooperado(): boolean {
+    return this.registerForm.get('perfil')?.value === Perfil.COOPERADO;
+  }
+
   onSubmit(): void {
     if (this.registerForm.valid) {
       this.isLoading = true;
       this.registerError = false;
 
-      const { email, password, firstName, lastName, cpf, birthDate } =
-        this.registerForm.value;
+      const { email, password, ...profileData } = this.registerForm.value;
+      delete profileData.confirmPassword; // Remover campo de confirmação
+
+      // Limpar fazenda se não for cooperado
+      if (profileData.perfil !== Perfil.COOPERADO) {
+        delete profileData.fazenda;
+      }
 
       this.authService
-        .registerWithProfile(email, password, {
-          firstName,
-          lastName,
-          cpf,
-          birthDate,
-        })
+        .registerWithProfile(email, password, profileData)
         .subscribe({
-          next: (userProfile) => {
+          next: () => {
             this.isLoading = false;
-            this.router.navigate(['/home']);
+            this.router.navigate(['/app']);
           },
           error: (error) => {
             this.isLoading = false;
             this.registerError = true;
-
-            if (error instanceof FirebaseError) {
-              switch (error.code) {
-                case 'auth/email-already-in-use':
-                  this.errorMessage = 'Este email já está em uso.';
-                  break;
-                case 'auth/invalid-email':
-                  this.errorMessage = 'Email inválido.';
-                  break;
-                case 'auth/weak-password':
-                  this.errorMessage =
-                    'Senha muito fraca. Use pelo menos 6 caracteres.';
-                  break;
-                default:
-                  this.errorMessage = `Erro no registro: ${error.message}`;
-              }
-            } else {
-              this.errorMessage =
-                'Ocorreu um erro durante o registro. Tente novamente.';
-            }
+            console.error('Erro no registro:', error);
+            this.cdr.detectChanges();
           },
         });
     } else {
-      this.markFormGroupTouched(this.registerForm);
+      this.markAllAsTouched(this.registerForm);
     }
   }
 
@@ -103,12 +124,11 @@ export class RegisterComponent {
     this.router.navigate(['/login']);
   }
 
-  private markFormGroupTouched(formGroup: FormGroup) {
+  private markAllAsTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
-
       if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
+        this.markAllAsTouched(control);
       }
     });
   }
@@ -172,15 +192,15 @@ export class RegisterComponent {
     };
   }
 
-  private birthDateValidator(): ValidatorFn {
+  private dataNascimentoValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const birthDate = control.value;
+      const dataNascimento = control.value;
 
-      if (!birthDate) {
+      if (!dataNascimento) {
         return null;
       }
 
-      const date = new Date(birthDate);
+      const date = new Date(dataNascimento);
       const today = new Date();
 
       if (isNaN(date.getTime())) {
@@ -207,4 +227,25 @@ export class RegisterComponent {
       return null;
     };
   }
+
+  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
+    if (field === 'password') {
+      this.passwordVisible = !this.passwordVisible;
+    } else {
+      this.confirmPasswordVisible = !this.confirmPasswordVisible;
+    }
+  }
+
+  getPerfilNome = (perfil: Perfil) => {
+    switch (perfil) {
+      case Perfil.COOPERADO:
+        return 'Cooperado';
+
+      case Perfil.COOPERATIVA:
+        return 'Cooperativa';
+
+      default:
+        return 'Sem perfil';
+    }
+  };
 }

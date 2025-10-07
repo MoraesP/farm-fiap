@@ -49,36 +49,36 @@
           </div>
 
           <div class="mb-3">
-            <label for="birthDate" class="form-label">Data de Nascimento</label>
+            <label for="dataNascimento" class="form-label">Data de Nascimento</label>
             <input
               type="date"
-              id="birthDate"
-              formControlName="birthDate"
+              id="dataNascimento"
+              formControlName="dataNascimento"
               class="form-control"
               [class.is-invalid]="
-                perfilForm.get('birthDate')?.invalid &&
-                perfilForm.get('birthDate')?.touched
+                perfilForm.get('dataNascimento')?.invalid &&
+                perfilForm.get('dataNascimento')?.touched
               "
             />
             <div
               class="invalid-feedback"
               *ngIf="
-                perfilForm.get('birthDate')?.invalid &&
-                perfilForm.get('birthDate')?.touched
+                perfilForm.get('dataNascimento')?.invalid &&
+                perfilForm.get('dataNascimento')?.touched
               "
             >
-              <span *ngIf="perfilForm.get('birthDate')?.errors?.['required']">
+              <span *ngIf="perfilForm.get('dataNascimento')?.errors?.['required']">
                 Data de nascimento é obrigatória.
               </span>
               <span
-                *ngIf="perfilForm.get('birthDate')?.errors?.['invalidDate']"
+                *ngIf="perfilForm.get('dataNascimento')?.errors?.['invalidDate']"
               >
                 Data de nascimento inválida.
               </span>
-              <span *ngIf="perfilForm.get('birthDate')?.errors?.['futureDate']">
+              <span *ngIf="perfilForm.get('dataNascimento')?.errors?.['futureDate']">
                 Data de nascimento não pode ser no futuro.
               </span>
-              <span *ngIf="perfilForm.get('birthDate')?.errors?.['minAge']">
+              <span *ngIf="perfilForm.get('dataNascimento')?.errors?.['minAge']">
                 Você deve ter pelo menos {{ IDADE_MINIMA }} anos.
               </span>
             </div>

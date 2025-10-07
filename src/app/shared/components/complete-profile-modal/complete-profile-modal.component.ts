@@ -9,7 +9,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { UserProfile } from '../../../core/models/user.model';
+import { PerfilUsuario } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-complete-profile-modal',
@@ -20,12 +20,12 @@ import { UserProfile } from '../../../core/models/user.model';
 })
 export class CompleteProfileModalComponent implements OnInit {
   @Input() show = false;
-  @Input() usuario: Partial<UserProfile> | null = null;
+  @Input() usuario: Partial<PerfilUsuario> | null = null;
 
   @Output() fecharEvent = new EventEmitter<void>();
   @Output() salvarEvent = new EventEmitter<{
     cpf: string;
-    birthDate: string;
+    dataNascimento: string;
   }>();
 
   perfilForm: FormGroup;
@@ -37,7 +37,10 @@ export class CompleteProfileModalComponent implements OnInit {
   constructor(private fb: FormBuilder) {
     this.perfilForm = this.fb.group({
       cpf: ['', [Validators.required, this.validarCPF()]],
-      birthDate: ['', [Validators.required, this.validarDataDeNascimento()]],
+      dataNascimento: [
+        '',
+        [Validators.required, this.validarDataDeNascimento()],
+      ],
     });
   }
 
@@ -46,8 +49,10 @@ export class CompleteProfileModalComponent implements OnInit {
       if (this.usuario.cpf) {
         this.perfilForm.get('cpf')?.setValue(this.usuario.cpf);
       }
-      if (this.usuario.birthDate) {
-        this.perfilForm.get('birthDate')?.setValue(this.usuario.birthDate);
+      if (this.usuario.dataNascimento) {
+        this.perfilForm
+          .get('dataNascimento')
+          ?.setValue(this.usuario.dataNascimento);
       }
     }
   }
@@ -55,9 +60,9 @@ export class CompleteProfileModalComponent implements OnInit {
   salvar(): void {
     if (this.perfilForm.valid) {
       this.carregando = true;
-      const { cpf, birthDate } = this.perfilForm.value;
+      const { cpf, dataNascimento } = this.perfilForm.value;
 
-      this.salvarEvent.emit({ cpf, birthDate });
+      this.salvarEvent.emit({ cpf, dataNascimento });
       this.carregando = false;
     } else {
       this.atualizarPerfilForm(this.perfilForm);
@@ -126,13 +131,13 @@ export class CompleteProfileModalComponent implements OnInit {
 
   private validarDataDeNascimento(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const birthDate = control.value;
+      const dataNascimento = control.value;
 
-      if (!birthDate) {
+      if (!dataNascimento) {
         return null;
       }
 
-      const date = new Date(birthDate);
+      const date = new Date(dataNascimento);
       const today = new Date();
 
       if (isNaN(date.getTime())) {

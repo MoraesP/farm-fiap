@@ -115,7 +115,7 @@
 <!-- Modal para completar o perfil -->
 <app-complete-profile-modal
   [show]="showCompleteProfileModal"
-  [usuario]="tempUserForModal"
+  [usuario]="perfilUsuarioTemp"
   (salvarEvent)="handleCompleteProfile($event)"
   (fecharEvent)="handleCloseModal()"
 ></app-complete-profile-modal>

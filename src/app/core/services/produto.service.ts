@@ -46,7 +46,7 @@ export class ProdutoService {
     const novoProduto: Omit<Produto, 'id'> = {
       ...dadosProduto,
       produtorId: usuario.uid,
-      produtorNome: this.userState.name,
+      produtorNome: this.userState.nomeUsuario,
       dataCadastro: new Date(),
     };
 

@@ -1,14 +1,25 @@
-export interface User {
+export interface Usuario {
   uid: string;
   email: string;
-  photoURL?: string;
 }
 
-export interface UserProfile extends User {
-  firstName: string;
-  lastName: string;
+export interface PerfilUsuario extends Usuario {
   cpf: string;
-  birthDate: string;
+  primeiroNome: string;
+  ultimoNome: string;
+  dataNascimento: string;
   createdAt: Date;
   updatedAt: Date;
+  perfil: Perfil;
+  fazenda?: Fazenda;
+}
+
+export interface Fazenda {
+  nome: string;
+  cnpj: string;
+}
+
+export enum Perfil {
+  COOPERATIVA = 'COOPERATIVA',
+  COOPERADO = 'COOPERADO',
 }

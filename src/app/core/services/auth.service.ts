@@ -11,7 +11,7 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Observable, from } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { UserProfile } from '../models/user.model';
+import { Perfil, PerfilUsuario } from '../models/user.model';
 import { UserStateService } from '../state/user-state.service';
 import { FirebaseService } from './firebase.service';
 
@@ -53,24 +53,25 @@ export class AuthService implements OnDestroy {
     });
   }
 
-  private mapFirebaseUser(firebaseUser: FirebaseUser): UserProfile {
-    let firstName = '';
-    let lastName = '';
+  private mapFirebaseUser(firebaseUser: FirebaseUser): PerfilUsuario {
+    let primeiroNome = '';
+    let ultimoNome = '';
 
     if (firebaseUser.displayName) {
       const nameParts = firebaseUser.displayName.split(' ');
-      firstName = nameParts[0] || '';
-      lastName = nameParts.slice(1).join(' ') || '';
+      primeiroNome = nameParts[0] || '';
+      ultimoNome = nameParts.slice(1).join(' ') || '';
     }
 
     return {
       uid: firebaseUser.uid,
       email: firebaseUser.email || '',
-      firstName,
-      lastName,
-      photoURL: firebaseUser.photoURL || undefined,
+      primeiroNome,
+      ultimoNome,
       cpf: '',
-      birthDate: '',
+      dataNascimento: '',
+      fazenda: undefined,
+      perfil: Perfil.COOPERADO,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -91,49 +92,50 @@ export class AuthService implements OnDestroy {
     email: string,
     password: string,
     profileData: Omit<
-      UserProfile,
-      'uid' | 'email' | 'photoURL' | 'createdAt' | 'updatedAt'
+      PerfilUsuario,
+      'uid' | 'email' | 'createdAt' | 'updatedAt'
     >
-  ): Observable<UserProfile> {
+  ): Observable<PerfilUsuario> {
     const auth = this.firebaseService.getAuth();
     const firestore = this.firebaseService.getFirestore();
 
     return from(createUserWithEmailAndPassword(auth, email, password)).pipe(
       switchMap((userCredential: UserCredential) => {
         const user = userCredential.user;
-        const displayName = `${profileData.firstName} ${profileData.lastName}`;
+        const displayName = `${profileData.primeiroNome} ${profileData.ultimoNome}`;
         return from(updateProfile(user, { displayName })).pipe(map(() => user));
       }),
       switchMap((user) => {
-        const userProfile: UserProfile = {
+        const perfilUsuario: PerfilUsuario = {
           uid: user.uid,
           email: user.email || '',
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
+          primeiroNome: profileData.primeiroNome,
+          ultimoNome: profileData.ultimoNome,
           cpf: profileData.cpf,
-          birthDate: profileData.birthDate,
-          photoURL: user.photoURL || undefined,
+          dataNascimento: profileData.dataNascimento,
+          perfil: profileData.perfil,
+          fazenda: profileData.fazenda || undefined, // Adiciona a fazenda
           createdAt: new Date(),
           updatedAt: new Date(),
         };
 
         const userDocRef = doc(firestore, 'users', user.uid);
-        return from(setDoc(userDocRef, userProfile)).pipe(
-          map(() => userProfile)
+        return from(setDoc(userDocRef, perfilUsuario)).pipe(
+          map(() => perfilUsuario)
         );
       }),
       tap((profile) => this.userState.definirUsuarioAutenticado(profile))
     );
   }
 
-  getUserProfile(uid: string): Observable<UserProfile | null> {
+  getUserProfile(uid: string): Observable<PerfilUsuario | null> {
     const firestore = this.firebaseService.getFirestore();
     const userDocRef = doc(firestore, 'users', uid);
 
     return from(getDoc(userDocRef)).pipe(
       map((docSnap) => {
         if (docSnap.exists()) {
-          return docSnap.data() as UserProfile;
+          return docSnap.data() as PerfilUsuario;
         }
         return null;
       })
