@@ -1,11 +1,11 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { UserStateService } from '../state/user-state.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
+  const userStateService = inject(UserStateService);
 
-  if (authService.isLoggedIn()) {
+  if (userStateService.estaLogado) {
     // Simulando token de autenticação
     const authReq = req.clone({
       setHeaders: {

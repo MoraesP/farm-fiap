@@ -1,0 +1,116 @@
+<div
+  class="modal"
+  [class.show]="show"
+  [style.display]="show ? 'block' : 'none'"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Complete seu cadastro</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="fechar()"
+          [disabled]="carregando"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Para concluir seu cadastro na Cooperativa de Fazendas FIAP Farms,
+          precisamos de algumas informações adicionais:
+        </p>
+
+        <form [formGroup]="perfilForm" (ngSubmit)="salvar()">
+          <div class="mb-3">
+            <label for="cpf" class="form-label">CPF</label>
+            <input
+              type="text"
+              id="cpf"
+              formControlName="cpf"
+              class="form-control"
+              placeholder="000.000.000-00"
+              [class.is-invalid]="
+                perfilForm.get('cpf')?.invalid && perfilForm.get('cpf')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="
+                perfilForm.get('cpf')?.invalid && perfilForm.get('cpf')?.touched
+              "
+            >
+              <span *ngIf="perfilForm.get('cpf')?.errors?.['required']">
+                CPF é obrigatório.
+              </span>
+              <span *ngIf="perfilForm.get('cpf')?.errors?.['invalidCpf']">
+                CPF inválido.
+              </span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="birthDate" class="form-label">Data de Nascimento</label>
+            <input
+              type="date"
+              id="birthDate"
+              formControlName="birthDate"
+              class="form-control"
+              [class.is-invalid]="
+                perfilForm.get('birthDate')?.invalid &&
+                perfilForm.get('birthDate')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="
+                perfilForm.get('birthDate')?.invalid &&
+                perfilForm.get('birthDate')?.touched
+              "
+            >
+              <span *ngIf="perfilForm.get('birthDate')?.errors?.['required']">
+                Data de nascimento é obrigatória.
+              </span>
+              <span
+                *ngIf="perfilForm.get('birthDate')?.errors?.['invalidDate']"
+              >
+                Data de nascimento inválida.
+              </span>
+              <span *ngIf="perfilForm.get('birthDate')?.errors?.['futureDate']">
+                Data de nascimento não pode ser no futuro.
+              </span>
+              <span *ngIf="perfilForm.get('birthDate')?.errors?.['minAge']">
+                Você deve ter pelo menos {{ IDADE_MINIMA }} anos.
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="fechar()"
+          [disabled]="carregando"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="salvar()"
+          [disabled]="perfilForm.invalid || carregando"
+        >
+          <span
+            *ngIf="carregando"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="show" (click)="fechar()"></div>

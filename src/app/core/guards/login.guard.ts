@@ -1,12 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { UserStateService } from '../state/user-state.service';
 
 export const loginGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
+  const userState = inject(UserStateService);
   const router = inject(Router);
 
-  if (authService.isLoggedIn()) {
+  if (userState.estaLogado) {
     return router.parseUrl('/home');
   }
 

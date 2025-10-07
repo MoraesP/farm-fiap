@@ -1,7 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import {
   User as FirebaseUser,
-  GoogleAuthProvider,
   UserCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,44 +9,31 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { BehaviorSubject, Observable, from, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { UserProfile } from '../models/user.model';
+import { UserStateService } from '../state/user-state.service';
 import { FirebaseService } from './firebase.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
   private unsubscribeAuth: (() => void) | null = null;
 
-  constructor(private firebaseService: FirebaseService) {
+  constructor(
+    private firebaseService: FirebaseService,
+    private userState: UserStateService
+  ) {
     this.unsubscribeAuth = this.firebaseService.onAuthStateChanged(
       (firebaseUser) => {
         if (firebaseUser) {
-          this.getUserProfile(firebaseUser.uid).subscribe((userProfile) => {
-            if (userProfile) {
-              this.currentUserSubject.next(userProfile);
-              localStorage.setItem('currentUser', JSON.stringify(userProfile));
-            } else {
-              const basicUser = this.mapFirebaseUser(firebaseUser);
-              this.currentUserSubject.next(basicUser);
-              localStorage.setItem('currentUser', JSON.stringify(basicUser));
-            }
-          });
+          this.handleAuthentication(firebaseUser);
         } else {
-          this.currentUserSubject.next(null);
-          localStorage.removeItem('currentUser');
+          this.userState.limparDadosUsuario();
         }
       }
     );
-
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
-    }
   }
 
   ngOnDestroy(): void {
@@ -56,11 +42,18 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  private mapFirebaseUser(firebaseUser: FirebaseUser): UserProfile | null {
-    if (!firebaseUser) {
-      return null;
-    }
+  private handleAuthentication(firebaseUser: FirebaseUser): void {
+    this.getUserProfile(firebaseUser.uid).subscribe((userProfile) => {
+      const profile = userProfile || this.mapFirebaseUser(firebaseUser);
+      if (this.userState.estaComPerfilCompleto(profile)) {
+        this.userState.definirUsuarioAutenticado(profile);
+      } else {
+        this.userState.comecarCompletandoPerfil(profile);
+      }
+    });
+  }
 
+  private mapFirebaseUser(firebaseUser: FirebaseUser): UserProfile {
     let firstName = '';
     let lastName = '';
 
@@ -83,79 +76,15 @@ export class AuthService implements OnDestroy {
     };
   }
 
-  login(email: string, password: string): Observable<UserProfile | null> {
+  login(email: string, password: string): Observable<UserCredential> {
     const auth = this.firebaseService.getAuth();
-
-    return from(signInWithEmailAndPassword(auth, email, password)).pipe(
-      switchMap((userCredential) => {
-        return this.getUserProfile(userCredential.user.uid).pipe(
-          map((userProfile) => {
-            if (userProfile) {
-              return userProfile;
-            } else {
-              return this.mapFirebaseUser(userCredential.user);
-            }
-          })
-        );
-      }),
-      catchError((error) => {
-        console.error('Erro no login:', error);
-        throw error;
-      })
-    );
+    return from(signInWithEmailAndPassword(auth, email, password));
   }
 
-  loginWithGoogle(): Observable<UserProfile> {
+  loginWithGoogle(): Observable<UserCredential> {
     const auth = this.firebaseService.getAuth();
     const googleProvider = this.firebaseService.getGoogleProvider();
-
-    return from(signInWithPopup(auth, googleProvider)).pipe(
-      switchMap((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        // const token = credential?.accessToken;
-
-        return this.getUserProfile(result.user.uid).pipe(
-          switchMap((userProfile) => {
-            if (userProfile) {
-              return of(userProfile);
-            } else {
-              const basicProfile = this.mapFirebaseUser(result.user);
-              if (!basicProfile) {
-                throw new Error('Falha na autenticação com Google');
-              }
-              // Salvar o Perfil básico no Firestore
-              const firestore = this.firebaseService.getFirestore();
-              const userDocRef = doc(firestore, 'users', basicProfile.uid);
-              return from(setDoc(userDocRef, basicProfile)).pipe(
-                map(() => basicProfile)
-              );
-            }
-          })
-        );
-      }),
-      catchError((error) => {
-        console.error('Erro no login com Google:', error);
-        throw error;
-      })
-    );
-  }
-
-  register(email: string, password: string): Observable<UserProfile> {
-    const auth = this.firebaseService.getAuth();
-
-    return from(createUserWithEmailAndPassword(auth, email, password)).pipe(
-      map((userCredential: UserCredential) => {
-        const user = this.mapFirebaseUser(userCredential.user);
-        if (!user) {
-          throw new Error('Falha no registro');
-        }
-        return user;
-      }),
-      catchError((error) => {
-        console.error('Erro no registro:', error);
-        throw error;
-      })
-    );
+    return from(signInWithPopup(auth, googleProvider));
   }
 
   registerWithProfile(
@@ -193,10 +122,7 @@ export class AuthService implements OnDestroy {
           map(() => userProfile)
         );
       }),
-      catchError((error) => {
-        console.error('Erro no registro comPerfil:', error);
-        throw error;
-      })
+      tap((profile) => this.userState.definirUsuarioAutenticado(profile))
     );
   }
 
@@ -208,39 +134,14 @@ export class AuthService implements OnDestroy {
       map((docSnap) => {
         if (docSnap.exists()) {
           return docSnap.data() as UserProfile;
-        } else {
-          return null;
         }
-      }),
-      catchError((error) => {
-        console.error('Erro ao buscar oPerfil do usuário:', error);
-        return of(null);
+        return null;
       })
     );
   }
 
   logout(): Observable<void> {
     const auth = this.firebaseService.getAuth();
-    return from(signOut(auth)).pipe(
-      catchError((error) => {
-        console.error('Erro no logout:', error);
-        throw error;
-      })
-    );
-  }
-
-  isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
-  }
-
-  getCurrentUser(): UserProfile | null {
-    return this.currentUserSubject.value;
-  }
-
-  get name(): string {
-    const user = this.currentUserSubject.value;
-    if (!user) return '';
-
-    return `${user.firstName} ${user.lastName}`.trim() || user.email;
+    return from(signOut(auth));
   }
 }

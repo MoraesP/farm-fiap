@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { UserStateService } from '../../core/state/user-state.service';
 
 @Component({
   selector: 'app-home',
@@ -13,15 +14,19 @@ import { AuthService } from '../../core/services/auth.service';
 export class HomeComponent {
   isLoggingOut = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private userStateService: UserStateService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   get userName(): string {
-    const user = this.authService.getCurrentUser();
-    return this.authService.name || 'Usuário';
+    const user = this.userStateService.usuarioAtual;
+    return this.userStateService.name || 'Usuário';
   }
 
   get userPhotoURL(): string | null {
-    const user = this.authService.getCurrentUser();
+    const user = this.userStateService.usuarioAtual;
     return user?.photoURL || null;
   }
 

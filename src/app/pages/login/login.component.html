@@ -1,10 +1,12 @@
-<div
-  class="d-flex justify-content-center align-items-center min-vh-100 bg-light"
->
-  <div class="card shadow p-4 w-100" style="max-width: 400px">
-    <h2 class="text-center mb-4">Login</h2>
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px">
+    <div class="text-center mb-4">
+      <i class="fas fa-tractor fa-3x text-primary"></i>
+      <h2 class="mt-2">FIAP Farms</h2>
+      <p class="text-muted">Acesse sua conta de cooperado</p>
+    </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
         <input
@@ -15,12 +17,13 @@
           [class.is-invalid]="
             loginForm.get('email')?.invalid && loginForm.get('email')?.touched
           "
+          autocomplete="email"
         />
         <div
-          class="invalid-feedback"
           *ngIf="
             loginForm.get('email')?.invalid && loginForm.get('email')?.touched
           "
+          class="invalid-feedback"
         >
           <span *ngIf="loginForm.get('email')?.errors?.['required']"
             >Email é obrigatório.</span
@@ -42,24 +45,22 @@
             loginForm.get('password')?.invalid &&
             loginForm.get('password')?.touched
           "
+          autocomplete="current-password"
         />
         <div
-          class="invalid-feedback"
           *ngIf="
             loginForm.get('password')?.invalid &&
             loginForm.get('password')?.touched
           "
+          class="invalid-feedback"
         >
           <span *ngIf="loginForm.get('password')?.errors?.['required']"
             >Senha é obrigatória.</span
           >
-          <span *ngIf="loginForm.get('password')?.errors?.['minlength']"
-            >A senha deve ter pelo menos 6 caracteres.</span
-          >
         </div>
       </div>
 
-      <div class="alert alert-danger" *ngIf="loginError">
+      <div class="alert alert-danger mt-3" *ngIf="loginError">
         {{ errorMessage }}
       </div>
 
@@ -71,52 +72,50 @@
         <span
           *ngIf="carregandoLogin"
           class="spinner-border spinner-border-sm me-2"
-          role="status"
-          aria-hidden="true"
         ></span>
         Entrar
       </button>
-    </form>
 
-    <div class="d-flex align-items-center my-3">
-      <hr class="flex-grow-1" />
-      <span class="mx-2 text-muted">ou</span>
-      <hr class="flex-grow-1" />
-    </div>
+      <div class="d-flex align-items-center my-3">
+        <hr class="flex-grow-1" />
+        <span class="mx-2 text-muted">ou</span>
+        <hr class="flex-grow-1" />
+      </div>
 
-    <button
-      class="btn btn-outline-danger w-100 mb-3 d-flex align-items-center justify-content-center"
-      (click)="loginWithGoogle()"
-      [disabled]="desabilitado"
-    >
-      <span
-        *ngIf="carregandoGoogle"
-        class="spinner-border spinner-border-sm me-2"
-        role="status"
-        aria-hidden="true"
-      ></span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        fill="currentColor"
-        class="bi bi-google me-2"
-        viewBox="0 0 16 16"
+      <button
+        type="button"
+        class="btn btn-outline-danger w-100 mb-3 d-flex align-items-center justify-content-center"
+        (click)="loginWithGoogle()"
+        [disabled]="desabilitado"
       >
-        <path
-          d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"
-        />
-      </svg>
-      Entrar com Google
-    </button>
+        <span
+          *ngIf="carregandoGoogle"
+          class="spinner-border spinner-border-sm me-2"
+        ></span>
+        <i class="fab fa-google me-2"></i>
+        Entrar com Google
+      </button>
 
-    <hr class="my-3" />
-    <button
-      class="btn btn-success w-100"
-      (click)="register()"
-      [disabled]="desabilitado"
-    >
-      Registrar
-    </button>
+      <hr />
+
+      <div class="text-center">
+        <p class="mb-0">
+          Não tem uma conta?
+          <a
+            href="javascript:void(0)"
+            (click)="register()"
+            class="fw-bold text-decoration-none"
+            >Registre-se</a
+          >
+        </p>
+      </div>
+    </form>
   </div>
-</div>
+
+<!-- Modal para completar o perfil -->
+<app-complete-profile-modal
+  [show]="showCompleteProfileModal"
+  [usuario]="tempUserForModal"
+  (salvarEvent)="handleCompleteProfile($event)"
+  (fecharEvent)="handleCloseModal()"
+></app-complete-profile-modal>
