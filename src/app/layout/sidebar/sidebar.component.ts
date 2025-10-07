@@ -17,7 +17,6 @@ export class SidebarComponent {
 
   menuItems = [
     { id: 'home', title: 'Início', icon: 'fa-home' },
-    { id: 'produtos', title: 'Produtos', icon: 'fa-boxes' },
     { id: 'sair', title: 'Sair' },
   ];
 

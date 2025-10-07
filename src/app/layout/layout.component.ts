@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from '../pages/home/home.component';
-import { ProdutosComponent } from '../pages/produtos/produtos.component';
 import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 
@@ -15,7 +14,6 @@ import { SidebarComponent } from './sidebar/sidebar.component';
     HeaderComponent,
     SidebarComponent,
     HomeComponent,
-    ProdutosComponent,
   ],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
