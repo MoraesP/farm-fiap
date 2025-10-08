@@ -18,5 +18,4 @@ export interface InsumoPlantado {
   quantidadePlantada: number;
   dataPlantio: Date;
   cooperadoUid: string;
-  cooperadoNome: string;
 }

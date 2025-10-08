@@ -13,6 +13,20 @@
     ></button>
   </div>
 
+  <!-- Mensagem de sucesso -->
+  <div
+    *ngIf="mensagemSucesso"
+    class="alert alert-success alert-dismissible fade show"
+    role="alert"
+  >
+    {{ mensagemSucesso }}
+    <button
+      type="button"
+      class="btn-close"
+      (click)="mensagemSucesso = ''"
+    ></button>
+  </div>
+
   <!-- Cabeçalho -->
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -47,6 +61,7 @@
                 <th>Valor Unitário</th>
                 <th>Valor Total</th>
                 <th>Data da Compra</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -57,6 +72,15 @@
                 <td>R$ {{ insumo.valorUnitario | number : "1.2-2" }}</td>
                 <td>R$ {{ insumo.valorTotal | number : "1.2-2" }}</td>
                 <td>{{ formatarData(insumo.dataCompra) }}</td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-success"
+                    (click)="abrirModalPlantar(insumo)"
+                    [disabled]="insumo.quantidade <= 0"
+                  >
+                    <i class="fas fa-seedling me-1"></i> Plantar
+                  </button>
+                </td>
               </tr>
             </tbody>
             <tfoot>
@@ -65,7 +89,7 @@
                 <td class="fw-bold">
                   R$ {{ calcularTotalGasto() | number : "1.2-2" }}
                 </td>
-                <td></td>
+                <td colspan="2"></td>
               </tr>
             </tfoot>
           </table>
@@ -73,4 +97,98 @@
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Modal para Plantar Insumo -->
+  <div
+    class="modal fade"
+    [ngClass]="{ show: modalPlantarAberto }"
+    [style.display]="modalPlantarAberto ? 'block' : 'none'"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="modalPlantarLabel"
+    [attr.aria-hidden]="!modalPlantarAberto"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalPlantarLabel">Plantar Insumo</h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="fecharModalPlantar()"
+            aria-label="Fechar"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="plantarForm">
+            <div class="mb-3">
+              <h6>Detalhes do Insumo</h6>
+              <div class="card p-3 mb-3">
+                <p><strong>Nome:</strong> {{ insumoSelecionado?.nome }}</p>
+                <p><strong>Tipo:</strong> {{ insumoSelecionado?.tipo }}</p>
+                <p>
+                  <strong>Disponível:</strong>
+                  {{ insumoSelecionado?.quantidade }}
+                  {{ insumoSelecionado?.unidadeMedida }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Quantidade a plantar -->
+            <div class="mb-3">
+              <label for="quantidadePlantar" class="form-label"
+                >Quantidade a Plantar</label
+              >
+              <input
+                type="number"
+                id="quantidadePlantar"
+                class="form-control"
+                formControlName="quantidade"
+                min="1"
+                [max]="insumoSelecionado?.quantidade || 0"
+              />
+              <div
+                *ngIf="
+                  plantarForm.get('quantidade')?.touched &&
+                  plantarForm.get('quantidade')?.invalid
+                "
+                class="text-danger"
+              >
+                <div *ngIf="plantarForm.get('quantidade')?.errors?.['required']">
+                  Quantidade é obrigatória.
+                </div>
+                <div *ngIf="plantarForm.get('quantidade')?.errors?.['min']">
+                  Quantidade deve ser maior que zero.
+                </div>
+                <div *ngIf="plantarForm.get('quantidade')?.errors?.['max']">
+                  Quantidade não pode ser maior que a disponível.
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModalPlantar()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            [disabled]="plantarForm.invalid"
+            (click)="confirmarPlantar()"
+          >
+            Confirmar Plantio
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="modal-backdrop fade"
+    [ngClass]="{ show: modalPlantarAberto }"
+    *ngIf="modalPlantarAberto"
+  ></div>
