@@ -58,6 +58,12 @@ export class SidebarComponent implements OnInit {
         icon: 'fa-leaf',
         perfilPermitido: [Perfil.COOPERADO],
       });
+      this.menuItems.push({
+        id: 'locais-em-uso',
+        title: 'Locais em Uso',
+        icon: 'fa-warehouse',
+        perfilPermitido: [Perfil.COOPERADO],
+      });
     }
 
     if (this.userState.usuarioAtual?.perfil === Perfil.COOPERATIVA) {

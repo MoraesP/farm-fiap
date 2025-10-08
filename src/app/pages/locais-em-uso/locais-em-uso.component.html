@@ -1,0 +1,91 @@
+<div class="container-fluid p-0">
+  <!-- Mensagem de erro -->
+  <div
+    *ngIf="mensagemErro"
+    class="alert alert-danger alert-dismissible fade show"
+    role="alert"
+  >
+    {{ mensagemErro }}
+    <button
+      type="button"
+      class="btn-close"
+      (click)="mensagemErro = ''"
+    ></button>
+  </div>
+
+  <!-- Cabeçalho -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3>Locais de Armazenamento em Uso</h3>
+      <div class="badge bg-primary fs-6">
+        Total de Locais: {{ locaisArmazenamento.length }}
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Tabela de locais -->
+      <div *ngIf="carregando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-2">Carregando seus locais de armazenamento...</p>
+      </div>
+
+      <div *ngIf="!carregando">
+        <div *ngIf="locaisArmazenamento.length === 0" class="text-center py-5">
+          <i class="fas fa-warehouse fa-3x text-muted mb-3"></i>
+          <p class="lead">
+            Sua fazenda não está utilizando nenhum local de armazenamento.
+          </p>
+          <p>
+            Colha seus produtos para começar a utilizar locais de armazenamento.
+          </p>
+        </div>
+
+        <div *ngIf="locaisArmazenamento.length > 0" class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Capacidade</th>
+                <th>Utilização</th>
+                <th>Última Atualização</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let local of locaisArmazenamento">
+                <td>{{ local.nome }}</td>
+                <td>{{ local.tipoArmazenamento }}</td>
+                <td>
+                  {{ local.capacidadeUtilizada }} /
+                  {{ local.capacidadeMaxima }} {{ local.tipoArmazenamento }}
+                </td>
+                <td>
+                  <div class="progress" style="height: 20px">
+                    <div
+                      class="progress-bar {{
+                        obterClasseProgresso(
+                          calcularPorcentagemUtilizada(local)
+                        )
+                      }}"
+                      role="progressbar"
+                      [style.width.%]="calcularPorcentagemUtilizada(local)"
+                      [attr.aria-valuenow]="calcularPorcentagemUtilizada(local)"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      {{
+                        calcularPorcentagemUtilizada(local) | number : "1.0-0"
+                      }}%
+                    </div>
+                  </div>
+                </td>
+                <td>{{ formatarData(local.updatedAt) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
