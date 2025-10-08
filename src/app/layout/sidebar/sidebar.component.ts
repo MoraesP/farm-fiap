@@ -1,7 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { Perfil } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
+import { UserStateService } from '../../core/state/user-state.service';
+
+interface MenuItem {
+  id: string;
+  title: string;
+  icon: string;
+  perfilPermitido?: Perfil[];
+}
 
 @Component({
   selector: 'app-sidebar',
@@ -10,17 +19,39 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   @Output() navegarEvent = new EventEmitter<string>();
 
   moduloAtivo = 'home';
+  menuItems: MenuItem[] = [];
 
-  menuItems = [
-    { id: 'home', title: 'Início', icon: 'fa-home' },
-    { id: 'sair', title: 'Sair' },
-  ];
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private userState: UserStateService
+  ) {}
 
-  constructor(private authService: AuthService, private router: Router) {}
+  ngOnInit(): void {
+    this.configurarMenuItems();
+  }
+
+  configurarMenuItems(): void {
+    // Itens básicos visíveis para todos os perfis
+    this.menuItems = [{ id: 'home', title: 'Início', icon: 'fa-home' }];
+
+    // Adiciona itens específicos para cooperados
+    if (this.userState.usuarioAtual?.perfil === Perfil.COOPERADO) {
+      this.menuItems.push({
+        id: 'insumos',
+        title: 'Insumos',
+        icon: 'fa-seedling',
+        perfilPermitido: [Perfil.COOPERADO],
+      });
+    }
+
+    // Adiciona o item de sair por último
+    this.menuItems.push({ id: 'sair', title: 'Sair', icon: 'fa-sign-out-alt' });
+  }
 
   navegar(moduloId: string): void {
     if (moduloId === 'sair') {

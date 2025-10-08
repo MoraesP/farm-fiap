@@ -1,0 +1,308 @@
+<div class="container-fluid">
+  <!-- Mensagens de feedback -->
+  <div
+    *ngIf="mensagemSucesso"
+    class="alert alert-success alert-dismissible fade show"
+    role="alert"
+  >
+    {{ mensagemSucesso }}
+    <button
+      type="button"
+      class="btn-close"
+      (click)="mensagemSucesso = ''"
+    ></button>
+  </div>
+  <div
+    *ngIf="mensagemErro"
+    class="alert alert-danger alert-dismissible fade show"
+    role="alert"
+  >
+    {{ mensagemErro }}
+    <button
+      type="button"
+      class="btn-close"
+      (click)="mensagemErro = ''"
+    ></button>
+  </div>
+
+  <!-- Cabeçalho -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3>Insumos Disponíveis</h3>
+      <button
+        *ngIf="eCooperado"
+        class="btn btn-primary"
+        (click)="abrirModalCompra()"
+      >
+        <i class="fas fa-plus me-2"></i>Comprar Insumos
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Tabela de insumos -->
+      <div *ngIf="carregando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-2">Carregando insumos...</p>
+      </div>
+
+      <div *ngIf="!carregando">
+        <div *ngIf="insumos.length === 0" class="text-center py-5">
+          <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+          <p class="lead">Nenhum insumo disponível no momento.</p>
+          <p *ngIf="eCooperado">
+            Clique em "Comprar Insumos" para adicionar novos itens.
+          </p>
+        </div>
+
+        <div *ngIf="insumos.length > 0" class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Unidade</th>
+                <th>Valor por Unidade</th>
+                <th>Quantidade Disponível</th>
+                <th *ngIf="eCooperado">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let insumo of insumos">
+                <td>{{ insumo.nome }}</td>
+                <td>{{ insumo.tipo }}</td>
+                <td>{{ insumo.unidadeMedida }}</td>
+                <td>R$ {{ insumo.valorPorUnidade | number : "1.2-2" }}</td>
+                <td>
+                  {{ insumo.quantidadeDisponivel }} {{ insumo.unidadeMedida }}
+                </td>
+                <td *ngIf="eCooperado">
+                  <button
+                    class="btn btn-sm btn-primary"
+                    (click)="abrirModalCompra(insumo)"
+                  >
+                    <i class="fas fa-shopping-cart me-1"></i> Comprar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Compra de Insumos -->
+<div
+  *ngIf="modalCompraAberto"
+  class="modal fade show d-block"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{
+            compraForm.get("insumo")?.value
+              ? "Comprar " + compraForm.get("insumo")?.value.nome
+              : "Comprar Insumo"
+          }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="fecharModalCompra()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="compraForm">
+          <!-- Seleção de insumo (se não foi pré-selecionado) -->
+          <div *ngIf="!compraForm.get('insumo')?.value" class="mb-3">
+            <label for="insumo" class="form-label">Insumo</label>
+            <select id="insumo" class="form-select" formControlName="insumo">
+              <option [ngValue]="null" disabled>Selecione um insumo</option>
+              <option *ngFor="let insumo of insumos" [ngValue]="insumo">
+                {{ insumo.nome }} - {{ insumo.tipo }} (R$
+                {{ insumo.valorPorUnidade | number : "1.2-2" }}/{{
+                  insumo.unidadeMedida
+                }})
+              </option>
+            </select>
+            <div
+              *ngIf="
+                compraForm.get('insumo')?.touched &&
+                compraForm.get('insumo')?.invalid
+              "
+              class="text-danger"
+            >
+              Selecione um insumo.
+            </div>
+          </div>
+
+          <!-- Detalhes do insumo selecionado -->
+          <div *ngIf="compraForm.get('insumo')?.value" class="mb-3">
+            <div class="card">
+              <div class="card-body">
+                <h6>Detalhes do Insumo</h6>
+                <p>
+                  <strong>Nome:</strong>
+                  {{ compraForm.get("insumo")?.value.nome }}
+                </p>
+                <p>
+                  <strong>Tipo:</strong>
+                  {{ compraForm.get("insumo")?.value.tipo }}
+                </p>
+                <p>
+                  <strong>Valor por Unidade:</strong> R$
+                  {{
+                    compraForm.get("insumo")?.value.valorPorUnidade
+                      | number : "1.2-2"
+                  }}/{{ compraForm.get("insumo")?.value.unidadeMedida }}
+                </p>
+                <p>
+                  <strong>Disponível:</strong>
+                  {{ compraForm.get("insumo")?.value.quantidadeDisponivel }}
+                  {{ compraForm.get("insumo")?.value.unidadeMedida }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantidade para o usuário atual -->
+          <div class="mb-3">
+            <label for="quantidade" class="form-label">Sua Quantidade</label>
+            <input
+              type="number"
+              id="quantidade"
+              class="form-control"
+              formControlName="quantidade"
+              min="1"
+            />
+            <div
+              *ngIf="
+                compraForm.get('quantidade')?.touched &&
+                compraForm.get('quantidade')?.invalid
+              "
+              class="text-danger"
+            >
+              <div *ngIf="compraForm.get('quantidade')?.errors?.['required']">
+                Quantidade é obrigatória.
+              </div>
+              <div *ngIf="compraForm.get('quantidade')?.errors?.['min']">
+                Quantidade deve ser pelo menos 1.
+              </div>
+            </div>
+          </div>
+
+          <!-- Seu total -->
+          <div *ngIf="compraForm.get('insumo')?.value" class="mb-4">
+            <p class="fw-bold">
+              Seu Total: R$ {{ calcularTotalUsuarioAtual() | number : "1.2-2" }}
+            </p>
+          </div>
+
+          <!-- Adicionar outros cooperados -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6>Outros Cooperados</h6>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="adicionarParticipante()"
+              >
+                <i class="fas fa-plus me-1"></i> Adicionar Cooperado
+              </button>
+            </div>
+
+            <div formArrayName="participantes">
+              <div
+                *ngFor="
+                  let participante of participantesFormArray.controls;
+                  let i = index
+                "
+                class="card mb-2"
+              >
+                <div class="card-body" [formGroupName]="i">
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label class="form-label">Cooperado</label>
+                      <select
+                        class="form-select"
+                        formControlName="cooperadoUid"
+                      >
+                        <option value="" disabled>
+                          Selecione um cooperado
+                        </option>
+                        <option
+                          *ngFor="let cooperado of cooperados"
+                          [value]="cooperado.uid"
+                        >
+                          {{ cooperado.nome }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Quantidade</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        formControlName="quantidade"
+                        min="1"
+                      />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        (click)="removerParticipante(i)"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="compraForm.get('insumo')?.value" class="mt-2">
+                    <small class="text-muted"
+                      >Total: R$
+                      {{
+                        calcularTotalPorParticipante(i) | number : "1.2-2"
+                      }}</small
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total da compra -->
+          <div *ngIf="compraForm.get('insumo')?.value" class="alert alert-info">
+            <h6>Total da Compra</h6>
+            <p class="h4 mb-0">
+              R$ {{ calcularTotalCompra() | number : "1.2-2" }}
+            </p>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="fecharModalCompra()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="compraForm.invalid"
+          (click)="confirmarCompra()"
+        >
+          Confirmar Compra
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+</div>
