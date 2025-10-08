@@ -32,9 +32,11 @@ export class InsumosComponent implements OnInit {
   cooperados: { uid: string; nome: string }[] = [];
 
   compraForm: FormGroup;
+  cadastroForm: FormGroup;
 
   carregando = true;
   modalCompraAberto = false;
+  modalCadastroAberto = false;
 
   tiposInsumo = Object.values(TipoInsumo);
   unidadesMedida = Object.values(UnidadeMedida);
@@ -49,6 +51,7 @@ export class InsumosComponent implements OnInit {
     private cooperadoService: CooperadoService
   ) {
     this.compraForm = this.criarFormularioCompra();
+    this.cadastroForm = this.criarFormularioCadastro();
   }
 
   ngOnInit(): void {
@@ -91,6 +94,16 @@ export class InsumosComponent implements OnInit {
     });
   }
 
+  criarFormularioCadastro(): FormGroup {
+    return this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(3)]],
+      tipo: ['', Validators.required],
+      unidadeMedida: ['', Validators.required],
+      valorPorUnidade: [0, [Validators.required, Validators.min(0.01)]],
+      quantidadeDisponivel: [0, [Validators.required, Validators.min(0)]],
+    });
+  }
+
   get participantesFormArray(): FormArray {
     return this.compraForm.get('participantes') as FormArray;
   }
@@ -121,6 +134,15 @@ export class InsumosComponent implements OnInit {
 
   fecharModalCompra(): void {
     this.modalCompraAberto = false;
+  }
+
+  abrirModalCadastro(): void {
+    this.cadastroForm.reset();
+    this.modalCadastroAberto = true;
+  }
+
+  fecharModalCadastro(): void {
+    this.modalCadastroAberto = false;
   }
 
   calcularTotalPorParticipante(index: number): number {
@@ -213,6 +235,41 @@ export class InsumosComponent implements OnInit {
         console.error('Erro ao registrar compra:', erro);
         this.mensagemErro =
           'Erro ao registrar compra. Tente novamente mais tarde.';
+        setTimeout(() => {
+          this.mensagemErro = '';
+        }, 3000);
+      },
+    });
+  }
+
+  cadastrarInsumo(): void {
+    if (this.cadastroForm.invalid) {
+      this.cadastroForm.markAllAsTouched();
+      return;
+    }
+
+    const novoInsumo = {
+      nome: this.cadastroForm.get('nome')?.value,
+      tipo: this.cadastroForm.get('tipo')?.value,
+      unidadeMedida: this.cadastroForm.get('unidadeMedida')?.value,
+      valorPorUnidade: this.cadastroForm.get('valorPorUnidade')?.value,
+      quantidadeDisponivel: this.cadastroForm.get('quantidadeDisponivel')
+        ?.value,
+    };
+
+    this.insumoService.adicionarInsumo(novoInsumo).subscribe({
+      next: () => {
+        this.mensagemSucesso = 'Insumo cadastrado com sucesso!';
+        this.fecharModalCadastro();
+        this.carregarInsumos();
+        setTimeout(() => {
+          this.mensagemSucesso = '';
+        }, 3000);
+      },
+      error: (erro) => {
+        console.error('Erro ao cadastrar insumo:', erro);
+        this.mensagemErro =
+          'Erro ao cadastrar insumo. Tente novamente mais tarde.';
         setTimeout(() => {
           this.mensagemErro = '';
         }, 3000);

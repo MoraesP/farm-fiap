@@ -37,12 +37,4 @@ export class HeaderComponent {
         return 'Sem perfil';
     }
   };
-
-  logout(): void {
-    this.isLoggingOut = true;
-    this.authService.logout().subscribe(() => {
-      this.router.navigate(['/login']);
-      this.isLoggingOut = false;
-    });
-  }
 }

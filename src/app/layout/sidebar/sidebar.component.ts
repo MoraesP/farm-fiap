@@ -47,8 +47,13 @@ export class SidebarComponent implements OnInit {
         icon: 'fa-seedling',
         perfilPermitido: [Perfil.COOPERADO],
       });
+      this.menuItems.push({
+        id: 'meus-insumos',
+        title: 'Meus Insumos',
+        icon: 'fa-shopping-basket',
+        perfilPermitido: [Perfil.COOPERADO],
+      });
     }
-
     // Adiciona o item de sair por último
     this.menuItems.push({ id: 'sair', title: 'Sair', icon: 'fa-sign-out-alt' });
   }

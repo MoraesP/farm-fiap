@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid p-0">
   <!-- Mensagens de feedback -->
   <div
     *ngIf="mensagemSucesso"
@@ -29,13 +29,18 @@
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h3>Insumos Disponíveis</h3>
-      <button
-        *ngIf="eCooperado"
-        class="btn btn-primary"
-        (click)="abrirModalCompra()"
-      >
-        <i class="fas fa-plus me-2"></i>Comprar Insumos
-      </button>
+      <div class="d-flex gap-2">
+        <button class="btn btn-success" (click)="abrirModalCadastro()">
+          <i class="fas fa-plus me-2"></i>Cadastrar Insumo
+        </button>
+        <button
+          *ngIf="eCooperado"
+          class="btn btn-primary"
+          (click)="abrirModalCompra()"
+        >
+          <i class="fas fa-shopping-cart me-2"></i>Comprar Insumos
+        </button>
+      </div>
     </div>
     <div class="card-body">
       <!-- Tabela de insumos -->
@@ -300,6 +305,183 @@
           (click)="confirmarCompra()"
         >
           Confirmar Compra
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+</div>
+
+<!-- Modal de Cadastro de Insumos -->
+<div
+  *ngIf="modalCadastroAberto"
+  class="modal fade show d-block"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cadastrar Novo Insumo</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="fecharModalCadastro()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="cadastroForm">
+          <!-- Nome do insumo -->
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome do Insumo</label>
+            <input
+              type="text"
+              id="nome"
+              class="form-control"
+              formControlName="nome"
+            />
+            <div
+              *ngIf="
+                cadastroForm.get('nome')?.touched &&
+                cadastroForm.get('nome')?.invalid
+              "
+              class="text-danger"
+            >
+              <div *ngIf="cadastroForm.get('nome')?.errors?.['required']">
+                Nome é obrigatório.
+              </div>
+              <div *ngIf="cadastroForm.get('nome')?.errors?.['minlength']">
+                Nome deve ter pelo menos 3 caracteres.
+              </div>
+            </div>
+          </div>
+
+          <!-- Tipo de insumo -->
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo de Insumo</label>
+            <select id="tipo" class="form-select" formControlName="tipo">
+              <option value="" disabled>Selecione um tipo</option>
+              <option *ngFor="let tipo of tiposInsumo" [value]="tipo">
+                {{ tipo }}
+              </option>
+            </select>
+            <div
+              *ngIf="
+                cadastroForm.get('tipo')?.touched &&
+                cadastroForm.get('tipo')?.invalid
+              "
+              class="text-danger"
+            >
+              Selecione um tipo de insumo.
+            </div>
+          </div>
+
+          <!-- Unidade de medida -->
+          <div class="mb-3">
+            <label for="unidadeMedida" class="form-label"
+              >Unidade de Medida</label
+            >
+            <select
+              id="unidadeMedida"
+              class="form-select"
+              formControlName="unidadeMedida"
+            >
+              <option value="" disabled>Selecione uma unidade</option>
+              <option *ngFor="let unidade of unidadesMedida" [value]="unidade">
+                {{ unidade }}
+              </option>
+            </select>
+            <div
+              *ngIf="
+                cadastroForm.get('unidadeMedida')?.touched &&
+                cadastroForm.get('unidadeMedida')?.invalid
+              "
+              class="text-danger"
+            >
+              Selecione uma unidade de medida.
+            </div>
+          </div>
+
+          <!-- Valor por unidade -->
+          <div class="mb-3">
+            <label for="valorPorUnidade" class="form-label"
+              >Valor por Unidade (R$)</label
+            >
+            <input
+              type="number"
+              id="valorPorUnidade"
+              class="form-control"
+              formControlName="valorPorUnidade"
+              min="0.01"
+              step="0.01"
+            />
+            <div
+              *ngIf="
+                cadastroForm.get('valorPorUnidade')?.touched &&
+                cadastroForm.get('valorPorUnidade')?.invalid
+              "
+              class="text-danger"
+            >
+              <div
+                *ngIf="cadastroForm.get('valorPorUnidade')?.errors?.['required']"
+              >
+                Valor por unidade é obrigatório.
+              </div>
+              <div *ngIf="cadastroForm.get('valorPorUnidade')?.errors?.['min']">
+                Valor por unidade deve ser maior que zero.
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantidade disponível -->
+          <div class="mb-3">
+            <label for="quantidadeDisponivel" class="form-label"
+              >Quantidade Disponível</label
+            >
+            <input
+              type="number"
+              id="quantidadeDisponivel"
+              class="form-control"
+              formControlName="quantidadeDisponivel"
+              min="0"
+            />
+            <div
+              *ngIf="
+                cadastroForm.get('quantidadeDisponivel')?.touched &&
+                cadastroForm.get('quantidadeDisponivel')?.invalid
+              "
+              class="text-danger"
+            >
+              <div
+                *ngIf="cadastroForm.get('quantidadeDisponivel')?.errors?.['required']"
+              >
+                Quantidade disponível é obrigatória.
+              </div>
+              <div
+                *ngIf="cadastroForm.get('quantidadeDisponivel')?.errors?.['min']"
+              >
+                Quantidade disponível não pode ser negativa.
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="fecharModalCadastro()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="cadastroForm.invalid"
+          (click)="cadastrarInsumo()"
+        >
+          Cadastrar Insumo
         </button>
       </div>
     </div>

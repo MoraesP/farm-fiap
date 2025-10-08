@@ -1,23 +1,16 @@
-<nav class="navbar navbar-expand navbar-light bg-white shadow-sm">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand navbar-light bg-white shadow-sm navbar-custom">
+  <div class="container-fluid p-0">
     <!-- Espaçador para empurrar o conteúdo para a direita -->
     <div class="flex-grow-1"></div>
 
     <!-- Conteúdo do usuário -->
     <div class="d-flex align-items-center">
-      <div class="me-3 text-end">
+      <div class="text-end">
         <div class="fw-bold">{{ userState.nomeUsuario }}</div>
         <small class="text-muted">{{
           getPerfilNome(usuarioAtual!.perfil)
         }}</small>
       </div>
-      <button
-        class="btn btn-link text-danger ms-2"
-        (click)="logout()"
-        [disabled]="isLoggingOut"
-      >
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
     </div>
   </div>
 </nav>

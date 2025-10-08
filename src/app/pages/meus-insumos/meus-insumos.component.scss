@@ -1,0 +1,35 @@
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.table {
+  th {
+    background-color: #f8f9fa;
+  }
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.table-primary {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.text-end {
+  text-align: right !important;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
