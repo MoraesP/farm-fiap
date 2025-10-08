@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { HomeComponent } from '../pages/home/home.component';
 import { InsumosComponent } from '../pages/insumos/insumos.component';
 import { MeusInsumosComponent } from '../pages/meus-insumos/meus-insumos.component';
+import { MinhaPlantacaoComponent } from '../pages/minha-plantacao/minha-plantacao.component';
 import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 
@@ -18,6 +19,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
     HomeComponent,
     InsumosComponent,
     MeusInsumosComponent,
+    MinhaPlantacaoComponent,
   ],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],

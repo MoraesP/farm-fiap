@@ -53,6 +53,12 @@ export class SidebarComponent implements OnInit {
         icon: 'fa-shopping-basket',
         perfilPermitido: [Perfil.COOPERADO],
       });
+      this.menuItems.push({
+        id: 'minha-plantacao',
+        title: 'Minha Plantação',
+        icon: 'fa-leaf',
+        perfilPermitido: [Perfil.COOPERADO],
+      });
     }
     // Adiciona o item de sair por último
     this.menuItems.push({ id: 'sair', title: 'Sair', icon: 'fa-sign-out-alt' });
