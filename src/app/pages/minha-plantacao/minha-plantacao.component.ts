@@ -39,7 +39,7 @@ export class MinhaPlantacaoComponent implements OnInit {
       return;
     }
 
-    this.plantacaoService.getPlantacoes(usuarioAtual.uid).subscribe({
+    this.plantacaoService.getPlantacoes(usuarioAtual.fazenda?.id!).subscribe({
       next: (plantacoes) => {
         this.plantacoes = plantacoes;
         this.carregando = false;

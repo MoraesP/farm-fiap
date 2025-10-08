@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Observable, from, map } from 'rxjs';
+import { PerfilUsuario } from '../models/user.model';
 import { FirebaseService } from './firebase.service';
 
 @Injectable({
@@ -9,7 +10,9 @@ import { FirebaseService } from './firebase.service';
 export class CooperadoService {
   constructor(private firebaseService: FirebaseService) {}
 
-  getCooperados(): Observable<{ uid: string; nome: string }[]> {
+  getCooperados(): Observable<
+    { uid: string; nome: string; fazendaId: string }[]
+  > {
     const firestore = this.firebaseService.getFirestore();
     const usersRef = collection(firestore, 'users');
     const cooperadosQuery = query(usersRef, where('perfil', '==', 'COOPERADO'));
@@ -17,10 +20,11 @@ export class CooperadoService {
     return from(getDocs(cooperadosQuery)).pipe(
       map((querySnapshot) => {
         return querySnapshot.docs.map((doc) => {
-          const data = doc.data();
+          const data = doc.data() as PerfilUsuario;
           return {
             uid: doc.id,
             nome: `${data['primeiroNome']} ${data['ultimoNome']}`,
+            fazendaId: data['fazenda']?.id!,
           };
         });
       })

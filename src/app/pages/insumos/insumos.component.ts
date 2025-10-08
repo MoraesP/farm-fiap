@@ -29,7 +29,7 @@ import { UserStateService } from '../../core/state/user-state.service';
 })
 export class InsumosComponent implements OnInit {
   insumos: Insumo[] = [];
-  cooperados: { uid: string; nome: string }[] = [];
+  cooperados: { uid: string; nome: string; fazendaId: string }[] = [];
 
   compraForm: FormGroup;
   cadastroForm: FormGroup;
@@ -200,6 +200,7 @@ export class InsumosComponent implements OnInit {
         valorTotal: this.calcularTotalUsuarioAtual(),
         cooperadoUid: usuarioAtual.uid,
         cooperadoNome: this.userState.nomeUsuario,
+        fazendaId: usuarioAtual.fazenda?.id!,
       },
     ];
 
@@ -222,6 +223,7 @@ export class InsumosComponent implements OnInit {
           valorTotal: this.calcularTotalPorParticipante(i),
           cooperadoUid: cooperado.uid,
           cooperadoNome: cooperado.nome,
+          fazendaId: cooperado.fazendaId,
         });
       }
     }

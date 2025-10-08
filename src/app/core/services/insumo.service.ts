@@ -183,4 +183,39 @@ export class InsumoService {
       return { unsubscribe };
     });
   }
+
+  getComprasInsumoDaFazenda(): Observable<CompraInsumo[]> {
+    const usuarioAtual = this.userState.usuarioAtual;
+    if (!usuarioAtual) {
+      return of([]);
+    }
+
+    const firestore = this.firebaseService.getFirestore();
+    const comprasRef = collection(firestore, 'compras_insumos');
+
+    // Implementação manual usando onSnapshot
+    return new Observable<CompraInsumo[]>((observer) => {
+      const unsubscribe = onSnapshot(
+        comprasRef,
+        (snapshot) => {
+          const compras = snapshot.docs
+            .map((doc) => {
+              return { id: doc.id, ...doc.data() } as CompraInsumo;
+            })
+            .filter((compra) => {
+              return compra.itens.some(
+                (item) => item.fazendaId === usuarioAtual.fazenda?.id
+              );
+            });
+          observer.next(compras);
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
+
+      // Retorna a função de limpeza para quando o Observable for cancelado
+      return { unsubscribe };
+    });
+  }
 }

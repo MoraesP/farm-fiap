@@ -17,10 +17,10 @@ import { FirebaseService } from './firebase.service';
 export class PlantacaoService {
   constructor(private firebaseService: FirebaseService) {}
 
-  getPlantacoes(cooperadoUid: string): Observable<Plantacao[]> {
+  getPlantacoes(fazendaId: string): Observable<Plantacao[]> {
     const firestore = this.firebaseService.getFirestore();
     const plantacoesRef = collection(firestore, 'plantacoes');
-    const q = query(plantacoesRef, where('cooperadoUid', '==', cooperadoUid));
+    const q = query(plantacoesRef, where('fazendaId', '==', fazendaId));
 
     return new Observable<Plantacao[]>((observer) => {
       const unsubscribe = onSnapshot(
@@ -50,7 +50,8 @@ export class PlantacaoService {
     insumoNome: string,
     quantidadePlantada: number,
     cooperadoUid: string,
-    cooperadoNome: string
+    cooperadoNome: string,
+    fazendaId: string
   ): Observable<Plantacao> {
     const firestore = this.firebaseService.getFirestore();
     const plantacoesRef = collection(firestore, 'plantacoes');
@@ -63,6 +64,7 @@ export class PlantacaoService {
       dataPlantio: new Date(),
       cooperadoUid,
       cooperadoNome,
+      fazendaId,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

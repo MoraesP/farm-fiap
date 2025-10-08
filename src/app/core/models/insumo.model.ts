@@ -17,6 +17,7 @@ export interface ItemCompraInsumo {
   quantidadeComprada: number;
   quantidadeUsada: number;
   valorTotal: number;
+  fazendaId: string;
   cooperadoUid: string;
   cooperadoNome: string;
 }

@@ -72,7 +72,7 @@ export class MeusInsumosComponent implements OnInit {
 
   carregarInsumosComprados(): void {
     this.carregando = true;
-    this.insumoService.getComprasInsumoDoUsuario().subscribe({
+    this.insumoService.getComprasInsumoDaFazenda().subscribe({
       next: (compras) => {
         this.processarCompras(compras);
         this.carregando = false;
@@ -185,7 +185,8 @@ export class MeusInsumosComponent implements OnInit {
         this.insumoCompradoSelecionado.nome,
         quantidadePlantar,
         usuarioAtual.uid,
-        this.userState.nomeUsuario
+        this.userState.nomeUsuario,
+        usuarioAtual.fazenda?.id!
       )
       .subscribe({
         next: () => {

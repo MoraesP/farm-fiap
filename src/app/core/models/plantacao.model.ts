@@ -9,6 +9,7 @@ export interface Plantacao {
   dataPlantio: Date;
   cooperadoUid: string;
   cooperadoNome: string;
+  fazendaId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,4 +20,5 @@ export interface InsumoPlantado {
   quantidadePlantada: number;
   dataPlantio: Date;
   cooperadoUid: string;
+  fazendaId: string;
 }
