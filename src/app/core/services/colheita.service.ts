@@ -12,6 +12,7 @@ import { LocalArmazenamento } from '../models/armazenamento.model';
 import { ProdutoColhido } from '../models/colheita.model';
 import { ArmazenamentoService } from './armazenamento.service';
 import { FirebaseService } from './firebase.service';
+import { PlantacaoService } from './plantacao.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,7 @@ export class ColheitaService {
 
   constructor(
     private firebaseService: FirebaseService,
+    private plantacaoService: PlantacaoService,
     private armazenamentoService: ArmazenamentoService
   ) {}
 
@@ -99,9 +101,12 @@ export class ColheitaService {
         localAtualizado
       )
     ).pipe(
-      // Usar switchMap em vez de map para achatar o Observable aninhado
+      // Marcar a plantação como colhida
       switchMap(() => {
-        // Depois registrar o produto colhido
+        return this.plantacaoService.marcarComoColhida(produto.plantacaoId);
+      }),
+      // Depois registrar o produto colhido
+      switchMap(() => {
         return from(addDoc(produtosRef, novoProduto)).pipe(
           map((docRef) => {
             return {

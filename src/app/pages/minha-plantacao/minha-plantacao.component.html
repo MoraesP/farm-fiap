@@ -46,6 +46,7 @@
                 <th>Nome</th>
                 <th>Quantidade Plantada</th>
                 <th>Data do Plantio</th>
+                <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -55,13 +56,25 @@
                 <td>{{ plantacao.quantidadePlantada }}</td>
                 <td>{{ formatarData(plantacao.dataPlantio) }}</td>
                 <td>
-                  <button 
-                    class="btn btn-sm btn-success" 
+                  <span *ngIf="plantacao.colhida" class="badge bg-success">
+                    <i class="fas fa-check me-1"></i> Colhida
+                  </span>
+                  <span *ngIf="!plantacao.colhida" class="badge bg-warning">
+                    <i class="fas fa-seedling me-1"></i> Em Crescimento
+                  </span>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-success"
                     (click)="abrirModalColheita(plantacao)"
                     title="Colher"
+                    [disabled]="plantacao.colhida"
                   >
                     <i class="fas fa-leaf me-1"></i> Colher
                   </button>
+                  <small *ngIf="plantacao.colhida" class="text-muted ms-2">
+                    Colhida em {{ formatarData(plantacao.dataColheita) }}
+                  </small>
                 </td>
               </tr>
             </tbody>
@@ -72,114 +85,184 @@
   </div>
 
   <!-- Modal de Colheita -->
-  <div class="modal" [class.show]="mostrarModalColheita" [style.display]="mostrarModalColheita ? 'block' : 'none'">
+  <div
+    class="modal"
+    [class.show]="mostrarModalColheita"
+    [style.display]="mostrarModalColheita ? 'block' : 'none'"
+  >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Colher Plantação</h5>
-          <button type="button" class="btn-close" (click)="fecharModalColheita()"></button>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="fecharModalColheita()"
+          ></button>
         </div>
         <div class="modal-body">
           <form [formGroup]="colheitaForm">
             <div class="mb-3">
               <label for="plantacao" class="form-label">Plantação</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                id="plantacao" 
-                [value]="plantacaoSelecionada?.insumoNome" 
+              <input
+                type="text"
+                class="form-control"
+                id="plantacao"
+                [value]="plantacaoSelecionada?.insumoNome"
                 disabled
               />
             </div>
-            
+
             <div class="mb-3">
-              <label for="nomeProduto" class="form-label">Nome do Produto Colhido</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                id="nomeProduto" 
+              <label for="nomeProduto" class="form-label"
+                >Nome do Produto Colhido</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="nomeProduto"
                 formControlName="nomeProduto"
-                [class.is-invalid]="colheitaForm.get('nomeProduto')?.invalid && colheitaForm.get('nomeProduto')?.touched"
+                [class.is-invalid]="
+                  colheitaForm.get('nomeProduto')?.invalid &&
+                  colheitaForm.get('nomeProduto')?.touched
+                "
               />
-              <div class="invalid-feedback" *ngIf="colheitaForm.get('nomeProduto')?.errors?.['required']">
+              <div
+                class="invalid-feedback"
+                *ngIf="colheitaForm.get('nomeProduto')?.errors?.['required']"
+              >
                 Nome do produto é obrigatório.
               </div>
             </div>
-            
+
             <div class="mb-3">
-              <label for="tipoProduto" class="form-label">Tipo do Produto</label>
-              <select 
-                class="form-select" 
-                id="tipoProduto" 
+              <label for="tipoProduto" class="form-label"
+                >Tipo do Produto</label
+              >
+              <select
+                class="form-select"
+                id="tipoProduto"
                 formControlName="tipoProduto"
-                [class.is-invalid]="colheitaForm.get('tipoProduto')?.invalid && colheitaForm.get('tipoProduto')?.touched"
+                [class.is-invalid]="
+                  colheitaForm.get('tipoProduto')?.invalid &&
+                  colheitaForm.get('tipoProduto')?.touched
+                "
               >
                 <option [ngValue]="null" disabled>Selecione um tipo</option>
                 <option *ngFor="let tipo of unidadesMedida" [value]="tipo">
                   {{ tipo }}
                 </option>
               </select>
-              <div class="invalid-feedback" *ngIf="colheitaForm.get('tipoProduto')?.errors?.['required']">
+              <div
+                class="invalid-feedback"
+                *ngIf="colheitaForm.get('tipoProduto')?.errors?.['required']"
+              >
                 Tipo do produto é obrigatório.
               </div>
             </div>
-            
+
             <div class="mb-3">
-              <label for="quantidade" class="form-label">Quantidade Colhida</label>
-              <input 
-                type="number" 
-                class="form-control" 
-                id="quantidade" 
+              <label for="quantidade" class="form-label"
+                >Quantidade Colhida</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="quantidade"
                 formControlName="quantidade"
                 min="1"
-                [class.is-invalid]="colheitaForm.get('quantidade')?.invalid && colheitaForm.get('quantidade')?.touched"
+                [class.is-invalid]="
+                  colheitaForm.get('quantidade')?.invalid &&
+                  colheitaForm.get('quantidade')?.touched
+                "
               />
-              <div class="invalid-feedback" *ngIf="colheitaForm.get('quantidade')?.errors?.['required']">
+              <div
+                class="invalid-feedback"
+                *ngIf="colheitaForm.get('quantidade')?.errors?.['required']"
+              >
                 Quantidade é obrigatória.
               </div>
-              <div class="invalid-feedback" *ngIf="colheitaForm.get('quantidade')?.errors?.['min']">
+              <div
+                class="invalid-feedback"
+                *ngIf="colheitaForm.get('quantidade')?.errors?.['min']"
+              >
                 Quantidade deve ser maior que zero.
               </div>
             </div>
-            
+
             <div class="mb-3">
-              <label for="localArmazenamentoId" class="form-label">Local de Armazenamento</label>
-              <select 
-                class="form-select" 
-                id="localArmazenamentoId" 
+              <label for="localArmazenamentoId" class="form-label"
+                >Local de Armazenamento</label
+              >
+              <select
+                class="form-select"
+                id="localArmazenamentoId"
                 formControlName="localArmazenamentoId"
-                [class.is-invalid]="colheitaForm.get('localArmazenamentoId')?.invalid && colheitaForm.get('localArmazenamentoId')?.touched"
-                [disabled]="!colheitaForm.get('tipoProduto')?.value || locaisFiltrados.length === 0"
+                [class.is-invalid]="
+                  colheitaForm.get('localArmazenamentoId')?.invalid &&
+                  colheitaForm.get('localArmazenamentoId')?.touched
+                "
+                [disabled]="
+                  !colheitaForm.get('tipoProduto')?.value ||
+                  locaisFiltrados.length === 0
+                "
               >
                 <option [ngValue]="null" disabled>
-                  {{ !colheitaForm.get('tipoProduto')?.value 
-                    ? 'Selecione primeiro o tipo do produto' 
-                    : locaisFiltrados.length === 0 
-                      ? 'Nenhum local disponível para este tipo' 
-                      : 'Selecione um local' }}
+                  {{
+                    !colheitaForm.get("tipoProduto")?.value
+                      ? "Selecione primeiro o tipo do produto"
+                      : locaisFiltrados.length === 0
+                      ? "Nenhum local disponível para este tipo"
+                      : "Selecione um local"
+                  }}
                 </option>
-                <option *ngFor="let local of locaisFiltrados" [value]="local.id">
-                  {{ local.nome }} ({{ local.capacidadeUtilizada }}/{{ local.capacidadeMaxima }} {{ local.tipoArmazenamento }})
+                <option
+                  *ngFor="let local of locaisFiltrados"
+                  [value]="local.id"
+                >
+                  {{ local.nome }} ({{ local.capacidadeUtilizada }}/{{
+                    local.capacidadeMaxima
+                  }}
+                  {{ local.tipoArmazenamento }})
                 </option>
               </select>
-              <div class="invalid-feedback" *ngIf="colheitaForm.get('localArmazenamentoId')?.errors?.['required']">
+              <div
+                class="invalid-feedback"
+                *ngIf="colheitaForm.get('localArmazenamentoId')?.errors?.['required']"
+              >
                 Local de armazenamento é obrigatório.
               </div>
-              <small class="form-text text-muted" *ngIf="locaisFiltrados.length === 0 && colheitaForm.get('tipoProduto')?.value">
-                Não há locais de armazenamento disponíveis para este tipo de produto. Crie um novo local na seção "Locais de Armazenamento".
+              <small
+                class="form-text text-muted"
+                *ngIf="
+                  locaisFiltrados.length === 0 &&
+                  colheitaForm.get('tipoProduto')?.value
+                "
+              >
+                Não há locais de armazenamento disponíveis para este tipo de
+                produto. Crie um novo local na seção "Locais de Armazenamento".
               </small>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="fecharModalColheita()">Cancelar</button>
-          <button 
-            type="button" 
-            class="btn btn-success" 
-            [disabled]="colheitaForm.invalid || isLoadingColheita" 
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModalColheita()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            [disabled]="colheitaForm.invalid || isLoadingColheita"
             (click)="colher()"
           >
-            <span *ngIf="isLoadingColheita" class="spinner-border spinner-border-sm me-2"></span>
+            <span
+              *ngIf="isLoadingColheita"
+              class="spinner-border spinner-border-sm me-2"
+            ></span>
             Colher
           </button>
         </div>
@@ -187,8 +270,9 @@
     </div>
   </div>
   <!-- Overlay para o modal -->
-  <div 
-    class="modal-backdrop fade show" 
+  <div
+    class="modal-backdrop fade show"
     *ngIf="mostrarModalColheita"
     (click)="fecharModalColheita()"
   ></div>
+</div>

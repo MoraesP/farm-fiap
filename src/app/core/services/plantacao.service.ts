@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   onSnapshot,
   query,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import { Observable, from, map } from 'rxjs';
@@ -65,6 +68,7 @@ export class PlantacaoService {
       cooperadoUid,
       cooperadoNome,
       fazendaId,
+      colhida: false, // Inicialmente não colhida
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -74,6 +78,19 @@ export class PlantacaoService {
         return { id: docRef.id, ...novaPlantacao } as Plantacao;
       })
     );
+  }
+
+  marcarComoColhida(plantacaoId: string): Observable<void> {
+    const firestore = this.firebaseService.getFirestore();
+    const plantacaoRef = doc(firestore, 'plantacoes', plantacaoId);
+    
+    const atualizacao = {
+      colhida: true,
+      dataColheita: new Date(),
+      updatedAt: new Date()
+    };
+    
+    return from(updateDoc(plantacaoRef, atualizacao));
   }
 
   atualizarQuantidadeInsumo(

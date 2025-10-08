@@ -10,6 +10,8 @@ export interface Plantacao {
   cooperadoUid: string;
   cooperadoNome: string;
   fazendaId: string;
+  colhida?: boolean;
+  dataColheita?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

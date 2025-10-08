@@ -127,11 +127,19 @@ export class MinhaPlantacaoComponent implements OnInit {
     );
   }
 
-  formatarData(data: Date | FirebaseTimestamp): string {
+  formatarData(data?: Date | FirebaseTimestamp): string {
+    if (!data) {
+      return 'Ainda não foi feito a colheita';
+    }
     return formatarData(data);
   }
 
   abrirModalColheita(plantacao: Plantacao): void {
+    if (plantacao.colhida) {
+      this.mensagemErro = 'Esta plantação já foi colhida.';
+      return;
+    }
+
     this.plantacaoSelecionada = plantacao;
     this.colheitaForm.reset({
       nomeProduto: '',
