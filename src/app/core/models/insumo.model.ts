@@ -4,7 +4,6 @@ export interface Insumo {
   tipo: string;
   unidadeMedida: string;
   valorPorUnidade: number;
-  quantidadeDisponivel: number;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDoc,
-    onSnapshot,
-    updateDoc
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
 } from 'firebase/firestore';
 import { Observable, from, map, of, switchMap } from 'rxjs';
 import { CompraInsumo, Insumo, StatusCompra } from '../models/insumo.model';
@@ -110,17 +110,12 @@ export class InsumoService {
 
     return from(addDoc(comprasRef, novaCompra)).pipe(
       switchMap((docRef) => {
-        // Atualizar o estoque dos insumos
         const atualizacoes = compra.itens.map((item) => {
           const insumoRef = doc(firestore, 'insumos', item.insumo.id!);
-          const novaQuantidade =
-            item.insumo.quantidadeDisponivel + item.quantidade;
           return updateDoc(insumoRef, {
-            quantidadeDisponivel: novaQuantidade,
             updatedAt: new Date(),
           });
         });
-
         return from(Promise.all(atualizacoes)).pipe(
           map(() => {
             return { id: docRef.id, ...novaCompra } as CompraInsumo;

@@ -100,7 +100,6 @@ export class InsumosComponent implements OnInit {
       tipo: ['', Validators.required],
       unidadeMedida: ['', Validators.required],
       valorPorUnidade: [0, [Validators.required, Validators.min(0.01)]],
-      quantidadeDisponivel: [0, [Validators.required, Validators.min(0)]],
     });
   }
 
@@ -253,8 +252,6 @@ export class InsumosComponent implements OnInit {
       tipo: this.cadastroForm.get('tipo')?.value,
       unidadeMedida: this.cadastroForm.get('unidadeMedida')?.value,
       valorPorUnidade: this.cadastroForm.get('valorPorUnidade')?.value,
-      quantidadeDisponivel: this.cadastroForm.get('quantidadeDisponivel')
-        ?.value,
     };
 
     this.insumoService.adicionarInsumo(novoInsumo).subscribe({

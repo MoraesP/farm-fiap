@@ -68,7 +68,6 @@
                 <th>Tipo</th>
                 <th>Unidade</th>
                 <th>Valor por Unidade</th>
-                <th>Quantidade Disponível</th>
                 <th *ngIf="eCooperado">Ações</th>
               </tr>
             </thead>
@@ -78,9 +77,6 @@
                 <td>{{ insumo.tipo }}</td>
                 <td>{{ insumo.unidadeMedida }}</td>
                 <td>R$ {{ insumo.valorPorUnidade | number : "1.2-2" }}</td>
-                <td>
-                  {{ insumo.quantidadeDisponivel }} {{ insumo.unidadeMedida }}
-                </td>
                 <td *ngIf="eCooperado">
                   <button
                     class="btn btn-sm btn-primary"
@@ -430,38 +426,6 @@
               </div>
               <div *ngIf="cadastroForm.get('valorPorUnidade')?.errors?.['min']">
                 Valor por unidade deve ser maior que zero.
-              </div>
-            </div>
-          </div>
-
-          <!-- Quantidade disponível -->
-          <div class="mb-3">
-            <label for="quantidadeDisponivel" class="form-label"
-              >Quantidade Disponível</label
-            >
-            <input
-              type="number"
-              id="quantidadeDisponivel"
-              class="form-control"
-              formControlName="quantidadeDisponivel"
-              min="0"
-            />
-            <div
-              *ngIf="
-                cadastroForm.get('quantidadeDisponivel')?.touched &&
-                cadastroForm.get('quantidadeDisponivel')?.invalid
-              "
-              class="text-danger"
-            >
-              <div
-                *ngIf="cadastroForm.get('quantidadeDisponivel')?.errors?.['required']"
-              >
-                Quantidade disponível é obrigatória.
-              </div>
-              <div
-                *ngIf="cadastroForm.get('quantidadeDisponivel')?.errors?.['min']"
-              >
-                Quantidade disponível não pode ser negativa.
               </div>
             </div>
           </div>
