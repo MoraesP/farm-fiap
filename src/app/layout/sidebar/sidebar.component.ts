@@ -67,6 +67,12 @@ export class SidebarComponent implements OnInit {
         icon: 'fa-tractor',
         perfilPermitido: [Perfil.COOPERATIVA],
       });
+      this.menuItems.push({
+        id: 'armazenamento',
+        title: 'Locais de Armazenamento',
+        icon: 'fa-warehouse',
+        perfilPermitido: [Perfil.COOPERATIVA],
+      });
     }
 
     this.menuItems.push({ id: 'sair', title: 'Sair', icon: 'fa-sign-out-alt' });
