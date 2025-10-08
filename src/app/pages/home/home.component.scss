@@ -1,1 +1,23 @@
-// Estilos específicos adicionais podem ser adicionados aqui se necessário
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+canvas {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 300px;
+}
+
+.col-md-12 canvas {
+  min-height: 350px;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}

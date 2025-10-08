@@ -1,5 +1,20 @@
 <div class="container-fluid p-0">
-  <div class="card">
+  <!-- Mensagem de erro -->
+  <div
+    *ngIf="mensagemErro"
+    class="alert alert-danger alert-dismissible fade show"
+    role="alert"
+  >
+    {{ mensagemErro }}
+    <button
+      type="button"
+      class="btn-close"
+      (click)="mensagemErro = ''"
+    ></button>
+  </div>
+
+  <!-- Cabeçalho -->
+  <div class="card mb-4">
     <div class="card-header">
       <h3>Bem-vindo à FIAP Farms!</h3>
     </div>
@@ -11,4 +26,76 @@
       </p>
     </div>
   </div>
-</div>
+
+  <!-- Gráficos - Apenas para cooperados -->
+  <div *ngIf="isCooperado" class="row">
+    <!-- Gráfico 1: Meus Insumos -->
+    <div class="col-md-12 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <div *ngIf="carregandoInsumos" class="text-center">
+            <div
+              class="spinner-border spinner-border-sm text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <span class="ms-2">Carregando dados de insumos...</span>
+          </div>
+          <canvas
+            #insumosChart
+            [style.display]="carregandoInsumos ? 'none' : 'block'"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico 2: Minha Plantação -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <div *ngIf="carregandoPlantacoes" class="text-center">
+            <div
+              class="spinner-border spinner-border-sm text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <span class="ms-2">Carregando dados de plantações...</span>
+          </div>
+          <canvas
+            #plantacaoChart
+            [style.display]="carregandoPlantacoes ? 'none' : 'block'"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico 3: Locais em Uso -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <div *ngIf="carregandoLocais" class="text-center">
+            <div
+              class="spinner-border spinner-border-sm text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <span class="ms-2">Carregando dados de locais...</span>
+          </div>
+          <canvas
+            #locaisChart
+            [style.display]="carregandoLocais ? 'none' : 'block'"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mensagem para usuários não cooperados -->
+  <div *ngIf="!isCooperado && userState.estaLogado" class="alert alert-info">
+    <h4 class="alert-heading">Bem-vindo à Cooperativa!</h4>
+    <p>Os gráficos e estatísticas estão disponíveis apenas para cooperados.</p>
+    <p class="mb-0">Se você é um cooperado, verifique se seu perfil está configurado corretamente.</p>
+  </div>
