@@ -12,6 +12,7 @@ import {
 import { Router } from '@angular/router';
 import { Fazenda, Perfil } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
+import { FazendaService } from '../../core/services/fazenda.service';
 
 @Component({
   selector: 'app-register',
@@ -22,20 +23,17 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
-  registerError = false;
-  errorMessage = '';
-  isLoading = false;
 
+  errorMessage = '';
+
+  isLoading = false;
+  registerError = false;
   passwordVisible = false;
   confirmPasswordVisible = false;
-  // Expor o enum e a lista para o template
+
   perfis = Object.values(Perfil);
 
-  fazendas: Fazenda[] = [
-    { nome: 'Fazenda Santa Clara', cnpj: '11.111.111/0001-11' },
-    { nome: 'Fazenda Boa Esperança', cnpj: '22.222.222/0001-22' },
-    { nome: 'Fazenda Sol Nascente', cnpj: '33.333.333/0001-33' },
-  ];
+  fazendas: Fazenda[] = [];
 
   private readonly IDADE_MINIMA = 18;
 
@@ -43,7 +41,8 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService
+    private authService: AuthService,
+    private fazendaService: FazendaService
   ) {
     this.registerForm = this.fb.group(
       {
@@ -68,6 +67,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.onPerfilChange();
+    this.carregarFazendas();
   }
 
   onPerfilChange(): void {
@@ -81,6 +81,18 @@ export class RegisterComponent implements OnInit {
       }
       fazendaControl?.updateValueAndValidity();
       this.cdr.detectChanges(); // Forçar detecção de mudanças
+    });
+  }
+
+  carregarFazendas(): void {
+    this.fazendaService.obterTodasFazendas().subscribe({
+      next: (fazendas) => {
+        this.fazendas = fazendas;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao carregar fazendas:', err);
+      },
     });
   }
 
@@ -98,7 +110,15 @@ export class RegisterComponent implements OnInit {
 
       // Limpar fazenda se não for cooperado
       if (profileData.perfil !== Perfil.COOPERADO) {
+        // Remover completamente o campo fazenda para evitar valores undefined
         delete profileData.fazenda;
+      } else if (profileData.fazenda === null) {
+        // Garantir que não haja valores null para cooperados
+        this.registerError = true;
+        this.errorMessage = 'Por favor, selecione uma fazenda.';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        return;
       }
 
       this.authService
@@ -111,6 +131,7 @@ export class RegisterComponent implements OnInit {
           error: (error) => {
             this.isLoading = false;
             this.registerError = true;
+            this.errorMessage = 'Erro ao registrar usuário. Tente novamente.';
             console.error('Erro no registro:', error);
             this.cdr.detectChanges();
           },

@@ -114,7 +114,7 @@ export class AuthService implements OnDestroy {
           cpf: profileData.cpf,
           dataNascimento: profileData.dataNascimento,
           perfil: profileData.perfil,
-          fazenda: profileData.fazenda || undefined, // Adiciona a fazenda
+          ...(profileData.fazenda ? { fazenda: profileData.fazenda } : {}),
           createdAt: new Date(),
           updatedAt: new Date(),
         };

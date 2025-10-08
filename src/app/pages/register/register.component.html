@@ -147,6 +147,14 @@
         </div>
       </div>
 
+      <!-- Mensagem de erro -->
+      <div class="alert alert-danger mb-3" *ngIf="registerError">
+        {{
+          errorMessage ||
+            "Ocorreu um erro durante o registro. Por favor, tente novamente."
+        }}
+      </div>
+
       <!-- Botão de cadastro e Link para Login -->
       <button
         type="submit"

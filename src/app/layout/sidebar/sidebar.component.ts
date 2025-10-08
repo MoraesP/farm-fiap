@@ -36,17 +36,16 @@ export class SidebarComponent implements OnInit {
   }
 
   configurarMenuItems(): void {
-    // Itens básicos visíveis para todos os perfis
     this.menuItems = [{ id: 'home', title: 'Início', icon: 'fa-home' }];
 
-    // Adiciona itens específicos para cooperados
+    this.menuItems.push({
+      id: 'insumos',
+      title: 'Insumos',
+      icon: 'fa-seedling',
+      perfilPermitido: [Perfil.COOPERADO],
+    });
+
     if (this.userState.usuarioAtual?.perfil === Perfil.COOPERADO) {
-      this.menuItems.push({
-        id: 'insumos',
-        title: 'Insumos',
-        icon: 'fa-seedling',
-        perfilPermitido: [Perfil.COOPERADO],
-      });
       this.menuItems.push({
         id: 'meus-insumos',
         title: 'Meus Insumos',
@@ -60,7 +59,16 @@ export class SidebarComponent implements OnInit {
         perfilPermitido: [Perfil.COOPERADO],
       });
     }
-    // Adiciona o item de sair por último
+
+    if (this.userState.usuarioAtual?.perfil === Perfil.COOPERATIVA) {
+      this.menuItems.push({
+        id: 'fazendas',
+        title: 'Fazendas',
+        icon: 'fa-tractor',
+        perfilPermitido: [Perfil.COOPERATIVA],
+      });
+    }
+
     this.menuItems.push({ id: 'sair', title: 'Sair', icon: 'fa-sign-out-alt' });
   }
 

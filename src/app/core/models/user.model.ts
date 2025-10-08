@@ -15,8 +15,11 @@ export interface PerfilUsuario extends Usuario {
 }
 
 export interface Fazenda {
+  id?: string;
   nome: string;
   cnpj: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export enum Perfil {
