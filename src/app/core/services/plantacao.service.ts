@@ -2,14 +2,12 @@ import { Injectable } from '@angular/core';
 import {
   addDoc,
   collection,
-  doc,
   onSnapshot,
   query,
-  updateDoc,
   where,
 } from 'firebase/firestore';
 import { Observable, from, map } from 'rxjs';
-import { ItemCompraInsumo } from '../models/insumo.model';
+import { CompraInsumo } from '../models/insumo.model';
 import { Plantacao } from '../models/plantacao.model';
 import { FirebaseService } from './firebase.service';
 
@@ -47,7 +45,9 @@ export class PlantacaoService {
   }
 
   registrarPlantacao(
-    itemInsumo: ItemCompraInsumo,
+    compraId: string,
+    insumoId: string,
+    insumoNome: string,
     quantidadePlantada: number,
     cooperadoUid: string,
     cooperadoNome: string
@@ -56,8 +56,9 @@ export class PlantacaoService {
     const plantacoesRef = collection(firestore, 'plantacoes');
 
     const novaPlantacao: Omit<Plantacao, 'id'> = {
-      insumoId: itemInsumo.insumo.id!,
-      insumoNome: itemInsumo.insumo.nome,
+      compraId,
+      insumoId,
+      insumoNome,
       quantidadePlantada,
       dataPlantio: new Date(),
       cooperadoUid,
@@ -74,23 +75,52 @@ export class PlantacaoService {
   }
 
   atualizarQuantidadeInsumo(
-    itemInsumo: ItemCompraInsumo,
+    compraId: string,
+    cooperadoUid: string,
     quantidadePlantada: number
   ): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const compraItemRef = doc(
-      firestore,
-      'compras_insumos',
-      itemInsumo.insumo.id!
-    );
 
-    // Atualizar a quantidade do insumo (subtrair a quantidade plantada)
-    const novaQuantidade = itemInsumo.quantidade - quantidadePlantada;
-
+    // Importar as funções necessárias do Firebase
     return from(
-      updateDoc(compraItemRef, {
-        quantidade: novaQuantidade,
-        updatedAt: new Date(),
+      import('firebase/firestore').then(({ doc, getDoc, updateDoc }) => {
+        const compraRef = doc(firestore, 'compras_insumos', compraId);
+
+        // Primeiro, obter o documento atual
+        return getDoc(compraRef).then((docSnap) => {
+          if (!docSnap.exists()) {
+            throw new Error('Compra não encontrada');
+          }
+
+          const compra = docSnap.data() as CompraInsumo;
+          const itens = compra.itens || [];
+
+          // Encontrar o item do usuário específico
+          const itemIndex = itens.findIndex(
+            (item: any) => item.cooperadoUid === cooperadoUid
+          );
+
+          if (itemIndex === -1) {
+            throw new Error('Item do usuário não encontrado na compra');
+          }
+
+          // Atualizar a quantidade usada para o item específico
+          const novaQuantidadeUsada =
+            (itens[itemIndex].quantidadeUsada || 0) + quantidadePlantada;
+
+          // Criar um novo array de itens com o item atualizado
+          const novosItens = [...itens];
+          novosItens[itemIndex] = {
+            ...novosItens[itemIndex],
+            quantidadeUsada: novaQuantidadeUsada,
+          };
+
+          // Atualizar o documento com os novos itens
+          return updateDoc(compraRef, {
+            itens: novosItens,
+            updatedAt: new Date(),
+          });
+        });
       })
     );
   }

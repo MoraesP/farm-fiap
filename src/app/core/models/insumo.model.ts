@@ -9,8 +9,13 @@ export interface Insumo {
 }
 
 export interface ItemCompraInsumo {
-  insumo: Insumo;
-  quantidade: number;
+  insumoId: string;
+  insumoNome: string;
+  insumoTipo: string;
+  unidadeMedida: string;
+  valorPorUnidade: number;
+  quantidadeComprada: number;
+  quantidadeUsada: number;
   valorTotal: number;
   cooperadoUid: string;
   cooperadoNome: string;

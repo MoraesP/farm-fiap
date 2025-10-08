@@ -190,8 +190,13 @@ export class InsumosComponent implements OnInit {
 
     const itens: ItemCompraInsumo[] = [
       {
-        insumo,
-        quantidade: quantidadeUsuarioAtual,
+        insumoId: insumo.id!,
+        insumoNome: insumo.nome,
+        insumoTipo: insumo.tipo,
+        unidadeMedida: insumo.unidadeMedida,
+        valorPorUnidade: insumo.valorPorUnidade,
+        quantidadeComprada: quantidadeUsuarioAtual,
+        quantidadeUsada: 0,
         valorTotal: this.calcularTotalUsuarioAtual(),
         cooperadoUid: usuarioAtual.uid,
         cooperadoNome: this.userState.nomeUsuario,
@@ -207,8 +212,13 @@ export class InsumosComponent implements OnInit {
 
       if (cooperado) {
         itens.push({
-          insumo,
-          quantidade,
+          insumoId: insumo.id!,
+          insumoNome: insumo.nome,
+          insumoTipo: insumo.tipo,
+          unidadeMedida: insumo.unidadeMedida,
+          valorPorUnidade: insumo.valorPorUnidade,
+          quantidadeComprada: quantidadeUsuarioAtual,
+          quantidadeUsada: 0,
           valorTotal: this.calcularTotalPorParticipante(i),
           cooperadoUid: cooperado.uid,
           cooperadoNome: cooperado.nome,

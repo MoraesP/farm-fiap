@@ -111,7 +111,7 @@ export class InsumoService {
     return from(addDoc(comprasRef, novaCompra)).pipe(
       switchMap((docRef) => {
         const atualizacoes = compra.itens.map((item) => {
-          const insumoRef = doc(firestore, 'insumos', item.insumo.id!);
+          const insumoRef = doc(firestore, 'insumos', item.insumoId);
           return updateDoc(insumoRef, {
             updatedAt: new Date(),
           });

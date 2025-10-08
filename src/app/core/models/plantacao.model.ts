@@ -2,6 +2,7 @@ import { Insumo } from './insumo.model';
 
 export interface Plantacao {
   id?: string;
+  compraId: string,
   insumoId: string;
   insumoNome: string;
   quantidadePlantada: number;

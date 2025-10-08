@@ -17,11 +17,13 @@ import {
 } from '../../core/utils/date-firebase';
 
 interface InsumoComprado {
-  id: string;
+  compraId: string;
+  insumoId: string;
   nome: string;
   tipo: string;
   unidadeMedida: string;
-  quantidade: number;
+  quantidadeComprada: number;
+  quantidadeUsada: number;
   valorUnitario: number;
   valorTotal: number;
   dataCompra: Date | FirebaseTimestamp;
@@ -43,7 +45,7 @@ export class MeusInsumosComponent implements OnInit {
 
   // Modal de plantio
   modalPlantarAberto = false;
-  insumoSelecionado: InsumoComprado | null = null;
+  insumoCompradoSelecionado: InsumoComprado | null = null;
   plantarForm: FormGroup;
 
   constructor(
@@ -101,12 +103,14 @@ export class MeusInsumosComponent implements OnInit {
       // Converter cada item em um InsumoComprado
       itensDoUsuario.forEach((item) => {
         this.insumosComprados.push({
-          id: item.insumo.id!,
-          nome: item.insumo.nome,
-          tipo: item.insumo.tipo,
-          unidadeMedida: item.insumo.unidadeMedida,
-          quantidade: item.quantidade,
-          valorUnitario: item.insumo.valorPorUnidade,
+          compraId: compra.id!,
+          insumoId: item.insumoId,
+          nome: item.insumoNome,
+          tipo: item.insumoTipo,
+          unidadeMedida: item.unidadeMedida,
+          quantidadeComprada: item.quantidadeComprada,
+          quantidadeUsada: item.quantidadeUsada,
+          valorUnitario: item.valorPorUnidade,
           valorTotal: item.valorTotal,
           dataCompra: compra.dataCompra,
         });
@@ -132,7 +136,7 @@ export class MeusInsumosComponent implements OnInit {
 
   // Métodos para o modal de plantio
   abrirModalPlantar(insumo: InsumoComprado): void {
-    this.insumoSelecionado = insumo;
+    this.insumoCompradoSelecionado = insumo;
 
     // Atualizar o validador de quantidade máxima
     this.plantarForm
@@ -140,7 +144,7 @@ export class MeusInsumosComponent implements OnInit {
       ?.setValidators([
         Validators.required,
         Validators.min(1),
-        Validators.max(insumo.quantidade),
+        Validators.max(this.getQuantidadeRestante(insumo)),
       ]);
 
     this.plantarForm.patchValue({
@@ -153,15 +157,20 @@ export class MeusInsumosComponent implements OnInit {
 
   fecharModalPlantar(): void {
     this.modalPlantarAberto = false;
-    this.insumoSelecionado = null;
+    this.insumoCompradoSelecionado = null;
   }
 
   confirmarPlantar(): void {
-    if (this.plantarForm.invalid || !this.insumoSelecionado) {
+    if (
+      this.plantarForm.invalid ||
+      !this.insumoCompradoSelecionado ||
+      !this.userState.usuarioAtual
+    ) {
       return;
     }
 
-    const quantidadePlantar = this.plantarForm.get('quantidade')?.value;
+    const quantidadePlantar = this.plantarForm.get('quantidade')
+      ?.value as number;
     const usuarioAtual = this.userState.usuarioAtual;
 
     if (!usuarioAtual) {
@@ -169,52 +178,35 @@ export class MeusInsumosComponent implements OnInit {
       return;
     }
 
-    const itemInsumo = {
-      insumo: {
-        id: this.insumoSelecionado.id,
-        nome: this.insumoSelecionado.nome,
-        tipo: this.insumoSelecionado.tipo,
-        unidadeMedida: this.insumoSelecionado.unidadeMedida,
-        valorPorUnidade: this.insumoSelecionado.valorUnitario,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      quantidade: this.insumoSelecionado.quantidade,
-      valorTotal: this.insumoSelecionado.valorTotal,
-      cooperadoUid: usuarioAtual.uid,
-      cooperadoNome: this.userState.nomeUsuario,
-    };
-
     this.plantacaoService
       .registrarPlantacao(
-        itemInsumo,
+        this.insumoCompradoSelecionado.compraId,
+        this.insumoCompradoSelecionado.insumoId,
+        this.insumoCompradoSelecionado.nome,
         quantidadePlantar,
         usuarioAtual.uid,
         this.userState.nomeUsuario
       )
       .subscribe({
         next: () => {
-          const novaQuantidade =
-            this.insumoSelecionado!.quantidade - quantidadePlantar;
-
-          if (this.insumoSelecionado) {
-            if (novaQuantidade <= 0) {
-              const index = this.insumosComprados.findIndex(
-                (i) => i === this.insumoSelecionado
-              );
-
-              if (index !== -1) {
-                this.insumosComprados.splice(index, 1);
-              }
-
-              this.mensagemSucesso = `Todo o estoque de ${this.insumoSelecionado.nome} foi plantado com sucesso!`;
-            } else {
-              this.insumoSelecionado.quantidade = novaQuantidade;
-              this.mensagemSucesso = `Plantio de ${quantidadePlantar} ${this.insumoSelecionado.unidadeMedida} de ${this.insumoSelecionado.nome} registrado com sucesso!`;
-            }
-          }
+          this.plantacaoService
+            .atualizarQuantidadeInsumo(
+              this.insumoCompradoSelecionado!.compraId,
+              this.userState.usuarioAtual!.uid,
+              quantidadePlantar
+            )
+            .subscribe({
+              next: () => {
+                this.mensagemSucesso = `Plantio de ${quantidadePlantar} ${
+                  this.insumoCompradoSelecionado!.unidadeMedida
+                } de ${
+                  this.insumoCompradoSelecionado!.nome
+                } registrado com sucesso!`;
+              },
+            });
 
           this.fecharModalPlantar();
+
           setTimeout(() => {
             this.mensagemSucesso = '';
           }, 3000);
@@ -225,5 +217,12 @@ export class MeusInsumosComponent implements OnInit {
             'Erro ao registrar plantio. Tente novamente mais tarde.';
         },
       });
+  }
+
+  getQuantidadeRestante(insumoComprado: InsumoComprado | null) {
+    return (
+      (insumoComprado?.quantidadeComprada || 0) -
+      (insumoComprado?.quantidadeUsada || 0)
+    );
   }
 }

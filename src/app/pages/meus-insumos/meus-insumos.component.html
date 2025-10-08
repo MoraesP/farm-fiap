@@ -58,6 +58,7 @@
                 <th>Nome</th>
                 <th>Tipo</th>
                 <th>Quantidade</th>
+                <th>Quantidade Plantada</th>
                 <th>Valor Unitário</th>
                 <th>Valor Total</th>
                 <th>Data da Compra</th>
@@ -68,7 +69,10 @@
               <tr *ngFor="let insumo of insumosComprados">
                 <td>{{ insumo.nome }}</td>
                 <td>{{ insumo.tipo }}</td>
-                <td>{{ insumo.quantidade }} {{ insumo.unidadeMedida }}</td>
+                <td>
+                  {{ insumo.quantidadeComprada }} {{ insumo.unidadeMedida }}
+                </td>
+                <td>{{ insumo.quantidadeUsada }} {{ insumo.unidadeMedida }}</td>
                 <td>R$ {{ insumo.valorUnitario | number : "1.2-2" }}</td>
                 <td>R$ {{ insumo.valorTotal | number : "1.2-2" }}</td>
                 <td>{{ formatarData(insumo.dataCompra) }}</td>
@@ -76,16 +80,23 @@
                   <button
                     class="btn btn-sm btn-success"
                     (click)="abrirModalPlantar(insumo)"
-                    [disabled]="insumo.quantidade <= 0"
+                    [disabled]="
+                      insumo.quantidadeComprada === insumo.quantidadeUsada
+                    "
                   >
-                    <i class="fas fa-seedling me-1"></i> Plantar
+                    <i class="fas fa-seedling me-1"></i>
+                    {{
+                      getQuantidadeRestante(insumo) > 0
+                        ? " Plantar"
+                        : "Plantado"
+                    }}
                   </button>
                 </td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="table-primary">
-                <td colspan="4" class="text-end fw-bold">Total:</td>
+                <td colspan="5" class="text-end fw-bold">Total:</td>
                 <td class="fw-bold">
                   R$ {{ calcularTotalGasto() | number : "1.2-2" }}
                 </td>
@@ -124,12 +135,16 @@
             <div class="mb-3">
               <h6>Detalhes do Insumo</h6>
               <div class="card p-3 mb-3">
-                <p><strong>Nome:</strong> {{ insumoSelecionado?.nome }}</p>
-                <p><strong>Tipo:</strong> {{ insumoSelecionado?.tipo }}</p>
+                <p>
+                  <strong>Nome:</strong> {{ insumoCompradoSelecionado?.nome }}
+                </p>
+                <p>
+                  <strong>Tipo:</strong> {{ insumoCompradoSelecionado?.tipo }}
+                </p>
                 <p>
                   <strong>Disponível:</strong>
-                  {{ insumoSelecionado?.quantidade }}
-                  {{ insumoSelecionado?.unidadeMedida }}
+                  {{ getQuantidadeRestante(insumoCompradoSelecionado) }}
+                  {{ insumoCompradoSelecionado?.unidadeMedida }}
                 </p>
               </div>
             </div>
@@ -145,7 +160,7 @@
                 class="form-control"
                 formControlName="quantidade"
                 min="1"
-                [max]="insumoSelecionado?.quantidade || 0"
+                [max]="getQuantidadeRestante(insumoCompradoSelecionado)"
               />
               <div
                 *ngIf="
@@ -154,7 +169,9 @@
                 "
                 class="text-danger"
               >
-                <div *ngIf="plantarForm.get('quantidade')?.errors?.['required']">
+                <div
+                  *ngIf="plantarForm.get('quantidade')?.errors?.['required']"
+                >
                   Quantidade é obrigatória.
                 </div>
                 <div *ngIf="plantarForm.get('quantidade')?.errors?.['min']">
@@ -192,3 +209,4 @@
     [ngClass]="{ show: modalPlantarAberto }"
     *ngIf="modalPlantarAberto"
   ></div>
+</div>
