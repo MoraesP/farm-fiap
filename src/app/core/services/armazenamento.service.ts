@@ -4,19 +4,12 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
-  getDocs,
   onSnapshot,
-  query,
   Timestamp,
   updateDoc,
-  where,
 } from 'firebase/firestore';
-import { from, map, Observable, switchMap } from 'rxjs';
-import {
-  ArmazenamentoOcupacao,
-  LocalArmazenamento,
-} from '../models/armazenamento.model';
+import { from, map, Observable } from 'rxjs';
+import { LocalArmazenamento } from '../models/armazenamento.model';
 import { FirebaseService } from './firebase.service';
 
 @Injectable({
@@ -76,7 +69,7 @@ export class ArmazenamentoService {
 
     const novoLocal = {
       ...local,
-      capacidadeUtilizada: 0, // Inicia com capacidade utilizada zero
+      capacidadeUtilizada: 0,
       createdAt: agora,
       updatedAt: agora,
     };

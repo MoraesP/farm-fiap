@@ -37,7 +37,6 @@ export class VendaService {
     const vendasRef = collection(firestore, this.VENDAS);
     const agora = Timestamp.now();
 
-    // Preparar dados da venda
     const novaVenda = {
       ...venda,
       dataVenda: Timestamp.fromDate(venda.dataVenda),
@@ -45,7 +44,6 @@ export class VendaService {
       updatedAt: agora,
     };
 
-    // Calcular nova capacidade utilizada
     const novaCapacidade = local.capacidadeUtilizada - venda.quantidade;
 
     const localFicaraVazio = novaCapacidade <= 0;
@@ -54,21 +52,18 @@ export class VendaService {
     const localNome = local.nome;
     const localId = local.id;
 
-    // Preparar atualização do local de armazenamento
     const localAtualizado: Partial<LocalArmazenamento> = {
       capacidadeUtilizada: novaCapacidade,
       updatedAt: new Date(),
     };
 
-    // Se vendeu tudo, remover as referências ao produto e fazenda
     if (localFicaraVazio) {
       localAtualizado.produtoId = null;
       localAtualizado.fazendaId = null;
       localAtualizado.fazendaNome = null;
-      localAtualizado.capacidadeUtilizada = 0; // Garantir que não fique negativo
+      localAtualizado.capacidadeUtilizada = 0;
     }
 
-    // Primeiro atualizar o local de armazenamento
     return from(
       this.armazenamentoService.atualizarLocalArmazenamento(
         local.id!,
@@ -87,11 +82,9 @@ export class VendaService {
             );
         }
       }),
-      // Depois registrar a venda
       switchMap(() => {
         return from(addDoc(vendasRef, novaVenda)).pipe(
           switchMap((docRef) => {
-            // Retornar os dados da venda com o ID
             return from(
               getDocs(query(vendasRef, where('__name__', '==', docRef.id)))
             ).pipe(

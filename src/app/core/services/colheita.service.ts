@@ -79,7 +79,6 @@ export class ColheitaService {
     const produtosRef = collection(firestore, this.PRODUTOS_COLHIDOS);
     const agora = Timestamp.now();
 
-    // Preparar dados do produto
     const novoProduto = {
       ...produtoColhido,
       dataColheita: Timestamp.fromDate(produtoColhido.dataColheita),
@@ -87,7 +86,6 @@ export class ColheitaService {
       updatedAt: agora,
     };
 
-    // Atualizar local de armazenamento
     const localAtualizado: Partial<LocalArmazenamento> = {
       capacidadeUtilizada:
         local.capacidadeUtilizada + produtoColhido.quantidade,
@@ -97,20 +95,17 @@ export class ColheitaService {
       updatedAt: new Date(),
     };
 
-    // Primeiro atualizar o local de armazenamento
     return from(
       this.armazenamentoService.atualizarLocalArmazenamento(
         local.id!,
         localAtualizado
       )
     ).pipe(
-      // Marcar a plantação como colhida
       switchMap(() => {
         return this.plantacaoService.marcarComoColhida(
           produtoColhido.plantacaoId
         );
       }),
-      // Depois registrar o produto colhido
       switchMap(() => {
         return from(addDoc(produtosRef, novoProduto)).pipe(
           map((docRef) => {

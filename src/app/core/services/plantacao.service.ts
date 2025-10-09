@@ -69,7 +69,7 @@ export class PlantacaoService {
       cooperadoUid,
       cooperadoNome,
       fazendaId,
-      colhida: false, // Inicialmente não colhida
+      colhida: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -101,12 +101,10 @@ export class PlantacaoService {
   ): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
 
-    // Importar as funções necessárias do Firebase
     return from(
       import('firebase/firestore').then(({ doc, getDoc, updateDoc }) => {
         const compraRef = doc(firestore, 'compras_insumos', compraId);
 
-        // Primeiro, obter o documento atual
         return getDoc(compraRef).then((docSnap) => {
           if (!docSnap.exists()) {
             throw new Error('Compra não encontrada');
@@ -115,7 +113,6 @@ export class PlantacaoService {
           const compra = docSnap.data() as CompraInsumo;
           const itens = compra.itens || [];
 
-          // Encontrar o item do usuário específico
           const itemIndex = itens.findIndex(
             (item: any) => item.fazendaId === fazendaId
           );
@@ -124,18 +121,15 @@ export class PlantacaoService {
             throw new Error('Item do usuário não encontrado na compra');
           }
 
-          // Atualizar a quantidade usada para o item específico
           const novaQuantidadeUsada =
             (itens[itemIndex].quantidadeUsada || 0) + quantidadePlantada;
 
-          // Criar um novo array de itens com o item atualizado
           const novosItens = [...itens];
           novosItens[itemIndex] = {
             ...novosItens[itemIndex],
             quantidadeUsada: novaQuantidadeUsada,
           };
 
-          // Atualizar o documento com os novos itens
           return updateDoc(compraRef, {
             itens: novosItens,
             updatedAt: new Date(),

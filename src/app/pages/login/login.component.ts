@@ -29,7 +29,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   carregandoLogin = false;
   carregandoGoogle = false;
 
-  // Estado do modal
   showCompleteProfileModal = false;
   perfilUsuarioTemp: PerfilUsuario | null = null;
   private subscriptions = new Subscription();
@@ -132,7 +131,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           break;
         case 'auth/popup-closed-by-user':
           this.errorMessage = 'O processo de login com Google foi cancelado.';
-          this.loginError = false; // Não é um erro crítico
+          this.loginError = false;
           break;
         default:
           this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente.';

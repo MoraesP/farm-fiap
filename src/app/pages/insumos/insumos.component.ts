@@ -204,7 +204,6 @@ export class InsumosComponent implements OnInit {
       },
     ];
 
-    // Adicionar itens dos outros participantes
     for (let i = 0; i < this.participantesFormArray.length; i++) {
       const participante = this.participantesFormArray.at(i);
       const cooperadoUid = participante.get('cooperadoUid')?.value;

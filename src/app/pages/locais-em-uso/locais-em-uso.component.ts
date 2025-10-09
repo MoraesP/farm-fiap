@@ -29,7 +29,6 @@ export class LocaisEmUsoComponent implements OnInit {
   carregando = true;
   mensagemErro = '';
 
-  // Propriedades para o modal de venda
   mostrarModalVenda = false;
   localSelecionado: LocalArmazenamento | null = null;
   produtoNome = '';
@@ -64,10 +63,8 @@ export class LocaisEmUsoComponent implements OnInit {
       return;
     }
 
-    // Buscar todos os locais de armazenamento
     this.armazenamentoService.obterLocaisArmazenamento().subscribe({
       next: (locais) => {
-        // Filtrar apenas os locais que estão sendo usados pela fazenda do usuário
         this.locaisArmazenamento = locais.filter(
           (local) =>
             local.fazendaId === usuarioAtual.fazenda?.id &&
@@ -105,11 +102,9 @@ export class LocaisEmUsoComponent implements OnInit {
     }
   }
 
-  // Métodos para o modal de venda
   abrirModalVenda(local: LocalArmazenamento): void {
     this.localSelecionado = local;
 
-    // Buscar o nome do produto
     if (local.produtoId) {
       this.produtoService.getProduto(local.produtoId).subscribe({
         next: (produto) => {
@@ -126,13 +121,11 @@ export class LocaisEmUsoComponent implements OnInit {
       });
     }
 
-    // Configurar o formulário
     this.vendaForm.reset({
       quantidade: 1,
       regiao: null,
     });
 
-    // Configurar validadores dinâmicos
     this.vendaForm
       .get('quantidade')
       ?.setValidators([
@@ -176,7 +169,6 @@ export class LocaisEmUsoComponent implements OnInit {
       return;
     }
 
-    // Preparar dados da venda
     const venda: Omit<Venda, 'id' | 'createdAt' | 'updatedAt'> = {
       produtoId: local.produtoId,
       produtoNome: this.produtoNome,
@@ -188,7 +180,6 @@ export class LocaisEmUsoComponent implements OnInit {
       dataVenda: new Date(),
     };
 
-    // Registrar a venda
     this.vendaService.registrarVenda(venda, local).subscribe({
       next: () => {
         this.isLoading = false;

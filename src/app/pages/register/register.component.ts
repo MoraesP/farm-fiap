@@ -55,7 +55,7 @@ export class RegisterComponent implements OnInit {
           [Validators.required, this.dataNascimentoValidator()],
         ],
         perfil: [Perfil.COOPERADO, Validators.required],
-        fazenda: [null], // Começa nulo
+        fazenda: [null],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]],
       },
@@ -80,7 +80,7 @@ export class RegisterComponent implements OnInit {
         fazendaControl?.setValue(null);
       }
       fazendaControl?.updateValueAndValidity();
-      this.cdr.detectChanges(); // Forçar detecção de mudanças
+      this.cdr.detectChanges();
     });
   }
 
@@ -106,14 +106,11 @@ export class RegisterComponent implements OnInit {
       this.registerError = false;
 
       const { email, password, ...profileData } = this.registerForm.value;
-      delete profileData.confirmPassword; // Remover campo de confirmação
+      delete profileData.confirmPassword;
 
-      // Limpar fazenda se não for cooperado
       if (profileData.perfil !== Perfil.COOPERADO) {
-        // Remover completamente o campo fazenda para evitar valores undefined
         delete profileData.fazenda;
       } else if (profileData.fazenda === null) {
-        // Garantir que não haja valores null para cooperados
         this.registerError = true;
         this.errorMessage = 'Por favor, selecione uma fazenda.';
         this.isLoading = false;

@@ -27,13 +27,14 @@ export class ArmazenamentoListComponent implements OnInit {
   unidadesMedida = Object.values(UnidadeMedida);
 
   isLoading = false;
+  modoEdicao = false;
+  mostrarFormulario = false;
+
   error = '';
 
-  // Formulário
   armazenamentoForm: FormGroup;
-  mostrarFormulario = false;
-  modoEdicao = false;
-  localEmEdicaoId: string | null = null;
+
+  localEmEdicaoId: string = null;
 
   constructor(
     private armazenamentoService: ArmazenamentoService,
@@ -83,7 +84,6 @@ export class ArmazenamentoListComponent implements OnInit {
 
   abrirFormulario(local?: LocalArmazenamento): void {
     if (local) {
-      // Modo edição
       this.modoEdicao = true;
       this.localEmEdicaoId = local.id!;
       this.armazenamentoForm.patchValue({
@@ -92,7 +92,6 @@ export class ArmazenamentoListComponent implements OnInit {
         capacidadeMaxima: local.capacidadeMaxima,
       });
     } else {
-      // Modo criação
       this.modoEdicao = false;
       this.localEmEdicaoId = null;
       this.armazenamentoForm.reset({
@@ -134,7 +133,6 @@ export class ArmazenamentoListComponent implements OnInit {
     };
 
     if (this.modoEdicao && this.localEmEdicaoId) {
-      // Atualizar local existente
       this.armazenamentoService
         .atualizarLocalArmazenamento(this.localEmEdicaoId, localData)
         .subscribe({
@@ -151,7 +149,6 @@ export class ArmazenamentoListComponent implements OnInit {
           },
         });
     } else {
-      // Criar novo local
       this.armazenamentoService
         .cadastrarLocalArmazenamento(localData)
         .subscribe({

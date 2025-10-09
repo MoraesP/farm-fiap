@@ -13,22 +13,18 @@ export interface FirebaseTimestamp {
  * @returns Objeto Date
  */
 export function converterTimestampParaDate(data: Date | FirebaseTimestamp | any): Date {
-  // Se já for um Date, retorna o próprio objeto
   if (data instanceof Date) {
     return data;
   }
   
-  // Verifica se é um Timestamp do Firebase (tem o método toDate)
   if (data && typeof data === 'object' && 'toDate' in data && typeof data.toDate === 'function') {
     return data.toDate();
   }
   
-  // Caso seja um objeto com seconds e nanoseconds (formato do Firestore)
   if (data && typeof data === 'object' && 'seconds' in data) {
     return new Date(data.seconds * 1000);
   }
   
-  // Fallback: tenta converter para Date
   return new Date(data);
 }
 

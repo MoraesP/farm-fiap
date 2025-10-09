@@ -227,7 +227,6 @@ export class MinhaPlantacaoComponent implements OnInit {
       return;
     }
 
-    // Verificar se há espaço suficiente
     if (
       localSelecionado.capacidadeUtilizada + formData.quantidade >
       localSelecionado.capacidadeMaxima
@@ -271,7 +270,6 @@ export class MinhaPlantacaoComponent implements OnInit {
         next: () => {
           this.isLoadingColheita = false;
           this.fecharModalColheita();
-          // Recarregar dados
           this.carregarLocaisArmazenamento();
         },
         error: (err) => {

@@ -82,7 +82,6 @@ export class NotificacaoService {
     const firestore = this.firebaseService.getFirestore();
     const notificacoesRef = collection(firestore, this.NOTIFICACOES);
 
-    // Implementação manual usando onSnapshot
     return new Observable<Notificacao[]>((observer) => {
       const q = query(
         notificacoesRef,
@@ -113,7 +112,6 @@ export class NotificacaoService {
         }
       );
 
-      // Retorna a função de limpeza para quando o Observable for cancelado
       return { unsubscribe };
     });
   }
@@ -130,7 +128,6 @@ export class NotificacaoService {
       return Promise.reject('Usuário não autenticado');
     }
 
-    // Caso contrário, atualizar no Firestore
     const firestore = this.firebaseService.getFirestore();
     const notificacaoRef = doc(firestore, this.NOTIFICACOES, notificacaoId);
 
@@ -147,7 +144,6 @@ export class NotificacaoService {
       return Promise.reject('Usuário não autenticado');
     }
 
-    // Caso contrário, buscar e atualizar todas as notificações não lidas no Firestore
     const firestore = this.firebaseService.getFirestore();
     const notificacoesRef = collection(firestore, this.NOTIFICACOES);
 
@@ -170,7 +166,6 @@ export class NotificacaoService {
     });
   }
 
-  // Método para notificar quando um local de armazenamento fica vazio
   notificarLocalDisponivel(
     localId: string,
     localNome: string,
@@ -182,7 +177,6 @@ export class NotificacaoService {
       return Promise.reject('Usuário não associado a uma fazenda');
     }
 
-    // Em um cenário real, buscar todos os usuários cooperados e enviar notificações
     const firestore = this.firebaseService.getFirestore();
     const usuariosRef = collection(firestore, this.USUARIOS);
 

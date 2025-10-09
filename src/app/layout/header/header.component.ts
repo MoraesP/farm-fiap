@@ -53,13 +53,10 @@ export class HeaderComponent {
         );
     }
 
-    // Aqui você pode adicionar lógica para navegar para uma página específica
-    // dependendo do tipo de notificação
     if (
       notificacao.tipo === 'LOCAL_DISPONIVEL' &&
       notificacao.dadosAdicionais?.localId
     ) {
-      // Navegar para a página de detalhes do local ou outra ação
       console.log('Navegar para local:', notificacao.dadosAdicionais.localId);
     }
   }

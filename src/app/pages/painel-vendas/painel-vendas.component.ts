@@ -22,9 +22,8 @@ interface DadosRegiao {
 export class PainelVendasComponent implements OnInit {
   @ViewChild(MapInfoWindow) infoWindow!: MapInfoWindow;
 
-  // Propriedades para o Google Maps
   mapOptions: google.maps.MapOptions = {
-    center: { lat: -15.7801, lng: -47.9292 }, // Centro do Brasil
+    center: { lat: -15.7801, lng: -47.9292 },
     zoom: 4,
     mapTypeId: 'roadmap',
     disableDefaultUI: true,
@@ -34,7 +33,6 @@ export class PainelVendasComponent implements OnInit {
     fullscreenControl: true,
   };
 
-  // Propriedades para o mapa de calor
   heatmapData: google.maps.visualization.WeightedLocation[] = [];
   heatmapOptions = {
     radius: 20,
@@ -57,7 +55,6 @@ export class PainelVendasComponent implements OnInit {
     ],
   };
 
-  // Dados de vendas
   vendas: Venda[] = [];
 
   dadosRegioes: DadosRegiao[] = [];
@@ -65,13 +62,12 @@ export class PainelVendasComponent implements OnInit {
   carregando = true;
   mensagemErro = '';
 
-  // Mapeamento de regiões para coordenadas
   coordenadasRegioes = {
-    [RegiaoVenda.NORTE]: { lat: -3.1019, lng: -60.0251 }, // Manaus
-    [RegiaoVenda.NORDESTE]: { lat: -8.0476, lng: -34.877 }, // Recife
-    [RegiaoVenda.CENTRO_OESTE]: { lat: -15.7801, lng: -47.9292 }, // Brasília
-    [RegiaoVenda.SUDESTE]: { lat: -23.5505, lng: -46.6333 }, // São Paulo
-    [RegiaoVenda.SUL]: { lat: -30.0277, lng: -51.2287 }, // Porto Alegre
+    [RegiaoVenda.NORTE]: { lat: -3.1019, lng: -60.0251 },
+    [RegiaoVenda.NORDESTE]: { lat: -8.0476, lng: -34.877 },
+    [RegiaoVenda.CENTRO_OESTE]: { lat: -15.7801, lng: -47.9292 },
+    [RegiaoVenda.SUDESTE]: { lat: -23.5505, lng: -46.6333 },
+    [RegiaoVenda.SUL]: { lat: -30.0277, lng: -51.2287 },
   };
 
   constructor(
@@ -109,21 +105,17 @@ export class PainelVendasComponent implements OnInit {
   }
 
   processarDadosVendas(): void {
-    // Agrupar vendas por região
     const vendasPorRegiao = new Map<RegiaoVenda, number>();
 
-    // Inicializar todas as regiões com zero
     Object.values(RegiaoVenda).forEach((regiao) => {
       vendasPorRegiao.set(regiao, 0);
     });
 
-    // Somar quantidades por região
     this.vendas.forEach((venda) => {
       const quantidadeAtual = vendasPorRegiao.get(venda.regiao) || 0;
       vendasPorRegiao.set(venda.regiao, quantidadeAtual + venda.quantidade);
     });
 
-    // Converter para o formato de dados para o mapa
     this.dadosRegioes = Array.from(vendasPorRegiao.entries()).map(
       ([regiao, quantidade]) => {
         const coordenadas = this.coordenadasRegioes[regiao];
@@ -136,14 +128,12 @@ export class PainelVendasComponent implements OnInit {
       }
     );
 
-    // Criar dados para o mapa de calor
     this.criarDadosMapaCalor();
   }
 
   criarDadosMapaCalor(): void {
-    // Converter dados de regiões para o formato do mapa de calor
     this.heatmapData = this.dadosRegioes
-      .filter((item) => item.quantidade > 0) // Filtrar apenas regiões com vendas
+      .filter((item) => item.quantidade > 0)
       .map((item) => {
         return {
           location: new google.maps.LatLng(item.lat, item.lng),
@@ -153,7 +143,6 @@ export class PainelVendasComponent implements OnInit {
   }
 
   onMapInitialized(map: google.maps.Map): void {
-    // Criar o mapa de calor quando o mapa for inicializado
     if (this.heatmapData.length > 0) {
       const heatmap = new google.maps.visualization.HeatmapLayer({
         data: this.heatmapData,
@@ -175,18 +164,21 @@ export class PainelVendasComponent implements OnInit {
 
   get quantidadePorRegiao() {
     const quantidadeTotal = this.dadosRegioes.reduce(
-        (total, regiao) => total + regiao.quantidade,
-        0
-      );
-      return this.formatarNumero(quantidadeTotal);
+      (total, regiao) => total + regiao.quantidade,
+      0
+    );
+    return this.formatarNumero(quantidadeTotal);
   }
 
-  // Método para formatar números grandes
   formatarNumero(numero: number): string {
     return numero.toLocaleString('pt-BR');
   }
 
   getDadosBarraProgressoPorRegiao(regiao: DadosRegiao) {
-    return regiao.quantidade / this.dadosRegioes.reduce((total, r) => total + r.quantidade, 0) * 100
+    return (
+      (regiao.quantidade /
+        this.dadosRegioes.reduce((total, r) => total + r.quantidade, 0)) *
+      100
+    );
   }
 }

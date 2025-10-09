@@ -13,19 +13,19 @@ import { FazendaService } from '../../../core/services/fazenda.service';
 })
 export class FazendasListComponent implements OnInit {
   fazendas: Fazenda[] = [];
-  isLoading = false;
+
   error = '';
 
-  // Campos para o formulário de nova fazenda
   novaFazenda = {
     nome: '',
     cnpj: '',
   };
 
-  // Estado do formulário
-  mostrarFormulario = false;
+  isLoading = false;
   modoEdicao = false;
-  fazendaEmEdicaoId: string | null = null;
+  mostrarFormulario = false;
+
+  fazendaEmEdicaoId: string = null;
 
   constructor(private fazendaService: FazendaService) {}
 
@@ -53,7 +53,6 @@ export class FazendasListComponent implements OnInit {
 
   abrirFormulario(fazenda?: Fazenda): void {
     if (fazenda) {
-      // Modo edição
       this.modoEdicao = true;
       this.fazendaEmEdicaoId = fazenda.id!;
       this.novaFazenda = {
@@ -61,7 +60,6 @@ export class FazendasListComponent implements OnInit {
         cnpj: fazenda.cnpj,
       };
     } else {
-      // Modo criação
       this.modoEdicao = false;
       this.fazendaEmEdicaoId = null;
       this.novaFazenda = {
@@ -93,7 +91,6 @@ export class FazendasListComponent implements OnInit {
     this.error = '';
 
     if (this.modoEdicao && this.fazendaEmEdicaoId) {
-      // Atualizar fazenda existente
       this.fazendaService
         .atualizarFazenda(this.fazendaEmEdicaoId, this.novaFazenda)
         .subscribe({
@@ -110,7 +107,6 @@ export class FazendasListComponent implements OnInit {
           },
         });
     } else {
-      // Criar nova fazenda
       this.fazendaService.cadastrarFazenda(this.novaFazenda).subscribe({
         next: () => {
           this.isLoading = false;

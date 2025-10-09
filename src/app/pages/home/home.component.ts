@@ -25,14 +25,13 @@ export class HomeComponent implements AfterViewInit {
   carregandoInsumos = true;
   carregandoPlantacoes = true;
   carregandoLocais = true;
+
   mensagemErro = '';
 
-  // Dados
   compras: CompraInsumo[] = [];
   plantacoes: Plantacao[] = [];
   locaisArmazenamento: LocalArmazenamento[] = [];
 
-  // Instâncias dos gráficos
   insumosChart: Chart | null = null;
   plantacaoChart: Chart | null = null;
   locaisChart: Chart | null = null;

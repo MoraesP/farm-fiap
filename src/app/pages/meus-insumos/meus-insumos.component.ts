@@ -96,7 +96,6 @@ export class MeusInsumosComponent implements OnInit {
     this.insumosComprados = [];
 
     compras.forEach((compra) => {
-      // Converter cada item em um InsumoComprado
       compra.itens.forEach((item) => {
         this.insumosComprados.push({
           compraId: compra.id!,
@@ -113,7 +112,6 @@ export class MeusInsumosComponent implements OnInit {
       });
     });
 
-    // Ordenar por data de compra (mais recente primeiro)
     this.insumosComprados.sort((a, b) =>
       compararDatas(a.dataCompra, b.dataCompra)
     );

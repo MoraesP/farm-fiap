@@ -1,8 +1,7 @@
-// Estilos para o componente de listagem de fazendas
 .card {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   transition: all 0.3s ease;
-  
+
   &:hover {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   }
@@ -16,23 +15,24 @@
   th {
     font-weight: 600;
   }
-  
+
   td {
     vertical-align: middle;
   }
 }
 
-// Animação para o spinner
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner-border {
   animation: spin 1s linear infinite;
 }
 
-// Estilo para ícones nas ações
-.btn-outline-primary, .btn-outline-danger {
+.btn-outline-primary,
+.btn-outline-danger {
   &:hover {
     i {
       color: white;
@@ -40,17 +40,15 @@
   }
 }
 
-// Estilo para o estado vazio
 .text-muted {
   opacity: 0.6;
 }
 
-// Responsividade para telas menores
 @media (max-width: 768px) {
   .table {
     font-size: 0.9rem;
   }
-  
+
   .btn-sm {
     padding: 0.2rem 0.4rem;
     font-size: 0.75rem;

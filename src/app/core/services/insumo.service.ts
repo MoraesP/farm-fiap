@@ -29,7 +29,6 @@ export class InsumoService {
     const firestore = this.firebaseService.getFirestore();
     const insumosRef = collection(firestore, this.INSUMOS);
 
-    // Implementação manual de collectionData usando onSnapshot
     return new Observable<Insumo[]>((observer) => {
       const unsubscribe = onSnapshot(
         insumosRef,
@@ -44,7 +43,6 @@ export class InsumoService {
         }
       );
 
-      // Retorna a função de limpeza para quando o Observable for cancelado
       return { unsubscribe };
     });
   }
@@ -132,7 +130,6 @@ export class InsumoService {
     const firestore = this.firebaseService.getFirestore();
     const comprasRef = collection(firestore, this.COMPRAS_INSUMOS);
 
-    // Implementação manual de collectionData usando onSnapshot
     return new Observable<CompraInsumo[]>((observer) => {
       const unsubscribe = onSnapshot(
         comprasRef,
@@ -147,7 +144,6 @@ export class InsumoService {
         }
       );
 
-      // Retorna a função de limpeza para quando o Observable for cancelado
       return { unsubscribe };
     });
   }
@@ -161,7 +157,6 @@ export class InsumoService {
     const firestore = this.firebaseService.getFirestore();
     const comprasRef = collection(firestore, this.COMPRAS_INSUMOS);
 
-    // Implementação manual usando onSnapshot
     return new Observable<CompraInsumo[]>((observer) => {
       const unsubscribe = onSnapshot(
         comprasRef,
@@ -182,7 +177,6 @@ export class InsumoService {
         }
       );
 
-      // Retorna a função de limpeza para quando o Observable for cancelado
       return { unsubscribe };
     });
   }
@@ -196,7 +190,6 @@ export class InsumoService {
     const firestore = this.firebaseService.getFirestore();
     const comprasRef = collection(firestore, this.COMPRAS_INSUMOS);
 
-    // Implementação manual usando onSnapshot
     return new Observable<CompraInsumo[]>((observer) => {
       const unsubscribe = onSnapshot(
         comprasRef,
@@ -217,7 +210,6 @@ export class InsumoService {
         }
       );
 
-      // Retorna a função de limpeza para quando o Observable for cancelado
       return { unsubscribe };
     });
   }
