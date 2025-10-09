@@ -1,9 +1,15 @@
 <div class="d-flex justify-content-center align-items-center min-vh-100">
   <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px">
-    <div class="text-center mb-4">
-      <i class="fas fa-tractor fa-3x text-primary"></i>
-      <h2 class="mt-2">FIAP Farms</h2>
-      <p class="text-muted">Acesse sua conta de cooperado</p>
+    <div class="text-center">
+      <img
+        src="/logo.png"
+        alt="FIAP & MORAES FARMS"
+        class="img-fluid"
+        style="max-width: 250px"
+      />
+      <p class="text-muted">
+        Acesse sua conta de Cooperado ou acesse a Cooperativa
+      </p>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
@@ -112,10 +118,11 @@
     </form>
   </div>
 
-<!-- Modal para completar o perfil -->
-<app-complete-profile-modal
-  [show]="showCompleteProfileModal"
-  [usuario]="perfilUsuarioTemp"
-  (salvarEvent)="handleCompleteProfile($event)"
-  (fecharEvent)="handleCloseModal()"
-></app-complete-profile-modal>
+  <!-- Modal para completar o Perfil -->
+  <app-complete-profile-modal
+    [show]="showCompleteProfileModal"
+    [usuario]="perfilUsuarioTemp"
+    (salvarEvent)="handleCompleteProfile($event)"
+    (fecharEvent)="handleCloseModal()"
+  ></app-complete-profile-modal>
+</div>
