@@ -96,13 +96,8 @@ export class MeusInsumosComponent implements OnInit {
     this.insumosComprados = [];
 
     compras.forEach((compra) => {
-      // Filtrar apenas os itens do usuário atual
-      const itensDoUsuario = compra.itens.filter(
-        (item) => item.cooperadoUid === usuarioAtual.uid
-      );
-
       // Converter cada item em um InsumoComprado
-      itensDoUsuario.forEach((item) => {
+      compra.itens.forEach((item) => {
         this.insumosComprados.push({
           compraId: compra.id!,
           insumoId: item.insumoId,

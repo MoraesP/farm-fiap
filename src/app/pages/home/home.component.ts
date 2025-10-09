@@ -62,7 +62,7 @@ export class HomeComponent implements AfterViewInit {
     }
 
     this.carregandoInsumos = true;
-    this.insumoService.getComprasInsumoDoUsuario().subscribe({
+    this.insumoService.getComprasInsumoDaFazenda().subscribe({
       next: (compras) => {
         this.compras = compras;
         this.criarGraficoInsumos();
