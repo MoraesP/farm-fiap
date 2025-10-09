@@ -37,7 +37,7 @@ export class FazendasListComponent implements OnInit {
     this.isLoading = true;
     this.error = '';
 
-    this.fazendaService.obterFazendas().subscribe({
+    this.fazendaService.obterTodasFazendas().subscribe({
       next: (fazendas) => {
         this.fazendas = fazendas;
         this.isLoading = false;

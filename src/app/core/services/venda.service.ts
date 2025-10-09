@@ -27,7 +27,7 @@ export class VendaService {
   ) {}
 
   /**
-   * Registra uma nova venda e atualiza o local de armazenamento
+   * Registrar uma nova venda e atualiza o local de armazenamento
    */
   registrarVenda(
     venda: Omit<Venda, 'id' | 'createdAt' | 'updatedAt'>,
@@ -117,7 +117,7 @@ export class VendaService {
   }
 
   /**
-   * Obtém todas as vendas de uma fazenda
+   * Obter todas as vendas de uma fazenda
    */
   obterVendas(fazendaId: string): Observable<Venda[]> {
     const firestore = this.firebaseService.getFirestore();

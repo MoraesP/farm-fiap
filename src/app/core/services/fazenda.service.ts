@@ -11,7 +11,6 @@ import {
 } from 'firebase/firestore';
 import { from, map, Observable } from 'rxjs';
 import { Fazenda } from '../models/user.model';
-import { UserStateService } from '../state/user-state.service';
 import { FirebaseService } from './firebase.service';
 
 @Injectable({
@@ -20,38 +19,10 @@ import { FirebaseService } from './firebase.service';
 export class FazendaService {
   private readonly FAZENDAS = 'fazendas';
 
-  constructor(
-    private firebaseService: FirebaseService,
-    private userState: UserStateService
-  ) {}
+  constructor(private firebaseService: FirebaseService) {}
 
   /**
-   * Obtém todas as fazendas cadastradas pela cooperativa atual
-   */
-  /**
-   * Obtém todas as fazendas cadastradas
-   */
-  obterFazendas(): Observable<Fazenda[]> {
-    const firestore = this.firebaseService.getFirestore();
-    const fazendasRef = collection(firestore, this.FAZENDAS);
-
-    return from(getDocs(fazendasRef)).pipe(
-      map((snapshot) => {
-        return snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            nome: data['nome'],
-            cnpj: data['cnpj'],
-            createdAt: data['createdAt']?.toDate(),
-            updatedAt: data['updatedAt']?.toDate(),
-          } as Fazenda;
-        });
-      })
-    );
-  }
-  /**
-   * Obtém todas as fazendas disponíveis no sistema
+   * Obter todas as fazendas disponíveis
    */
   obterTodasFazendas(): Observable<Fazenda[]> {
     const firestore = this.firebaseService.getFirestore();
@@ -74,10 +45,7 @@ export class FazendaService {
   }
 
   /**
-   * Cadastra uma nova fazenda
-   */
-  /**
-   * Cadastra uma nova fazenda
+   * Cadastrar uma nova fazenda
    */
   cadastrarFazenda(
     fazenda: Omit<Fazenda, 'id' | 'createdAt' | 'updatedAt'>
@@ -105,7 +73,7 @@ export class FazendaService {
   }
 
   /**
-   * Atualiza uma fazenda existente
+   * Atualizar uma fazenda existente
    */
   atualizarFazenda(
     id: string,
@@ -123,7 +91,7 @@ export class FazendaService {
   }
 
   /**
-   * Remove uma fazenda
+   * Remover uma fazenda
    */
   removerFazenda(id: string): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
@@ -133,7 +101,7 @@ export class FazendaService {
   }
 
   /**
-   * Obtém uma fazenda pelo ID
+   * Obter uma fazenda pelo ID
    */
   obterFazendaPorId(id: string): Observable<Fazenda | null> {
     const firestore = this.firebaseService.getFirestore();

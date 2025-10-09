@@ -21,7 +21,7 @@ export class ArmazenamentoService {
   constructor(private firebaseService: FirebaseService) {}
 
   /**
-   * Obtém todos os locais de armazenamento
+   * Obter todos os locais de armazenamento
    */
   obterLocaisArmazenamento(): Observable<LocalArmazenamento[]> {
     const firestore = this.firebaseService.getFirestore();
@@ -58,7 +58,7 @@ export class ArmazenamentoService {
   }
 
   /**
-   * Cadastra um novo local de armazenamento
+   * Cadastrar um novo local de armazenamento
    */
   cadastrarLocalArmazenamento(
     local: Omit<LocalArmazenamento, 'id' | 'createdAt' | 'updatedAt'>
@@ -87,7 +87,7 @@ export class ArmazenamentoService {
   }
 
   /**
-   * Atualiza um local de armazenamento existente
+   * Atualizar um local de armazenamento existente
    */
   atualizarLocalArmazenamento(
     id: string,
@@ -105,7 +105,7 @@ export class ArmazenamentoService {
   }
 
   /**
-   * Remove um local de armazenamento
+   * Remover um local de armazenamento
    */
   removerLocalArmazenamento(id: string): Observable<void> {
     const firestore = this.firebaseService.getFirestore();

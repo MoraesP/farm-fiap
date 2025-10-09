@@ -23,7 +23,7 @@ export class ProdutoService {
   constructor(private firebaseService: FirebaseService) {}
 
   /**
-   * Obtém todos os produtos disponíveis
+   * Obter todos os produtos disponíveis
    */
   getProdutos(): Observable<Produto[]> {
     const firestore = this.firebaseService.getFirestore();
@@ -48,7 +48,7 @@ export class ProdutoService {
   }
 
   /**
-   * Obtém um produto específico pelo ID
+   * Obter um produto específico pelo ID
    * @param id ID do produto
    */
   getProduto(id: string): Observable<Produto | null> {
@@ -65,7 +65,7 @@ export class ProdutoService {
   }
 
   /**
-   * Adiciona um novo produto
+   * Adicionar um novo produto
    * @param produto Dados do produto a ser adicionado
    */
   adicionarProduto(
@@ -89,7 +89,7 @@ export class ProdutoService {
   }
 
   /**
-   * Atualiza um produto existente
+   * Atualizar um produto existente
    * @param id ID do produto
    * @param produto Dados atualizados do produto
    */
@@ -106,7 +106,7 @@ export class ProdutoService {
   }
 
   /**
-   * Remove um produto
+   * Remover um produto
    * @param id ID do produto a ser removido
    */
   removerProduto(id: string): Observable<void> {
@@ -116,7 +116,7 @@ export class ProdutoService {
   }
 
   /**
-   * Obtém produtos relacionados a um insumo específico
+   * Obter produtos relacionados a um insumo específico
    * @param insumoId ID do insumo
    */
   getProdutosPorInsumo(insumoId: string): Observable<Produto[]> {

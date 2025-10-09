@@ -52,13 +52,6 @@ export class HeaderComponent {
           console.error('Erro ao marcar notificação como lida:', error)
         );
     }
-
-    if (
-      notificacao.tipo === 'LOCAL_DISPONIVEL' &&
-      notificacao.dadosAdicionais?.localId
-    ) {
-      console.log('Navegar para local:', notificacao.dadosAdicionais.localId);
-    }
   }
 
   marcarTodasComoLidas(): void {

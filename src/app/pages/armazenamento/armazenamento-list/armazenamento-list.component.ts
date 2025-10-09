@@ -54,7 +54,7 @@ export class ArmazenamentoListComponent implements OnInit {
   }
 
   carregarFazendas(): void {
-    this.fazendaService.obterFazendas().subscribe({
+    this.fazendaService.obterTodasFazendas().subscribe({
       next: (fazendas) => {
         this.fazendas = fazendas;
       },

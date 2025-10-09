@@ -27,7 +27,7 @@ export class ColheitaService {
   ) {}
 
   /**
-   * Obtém todos os produtos colhidos de uma fazenda
+   * Obter todos os produtos colhidos de uma fazenda
    */
   obterProdutosColhidos(fazendaId: string): Observable<ProdutoColhido[]> {
     const firestore = this.firebaseService.getFirestore();
@@ -69,7 +69,7 @@ export class ColheitaService {
   }
 
   /**
-   * Registra um novo produto colhido e atualiza o local de armazenamento
+   * Registrar um novo produto colhido e atualiza o local de armazenamento
    */
   registrarColheita(
     produtoColhido: Omit<ProdutoColhido, 'id' | 'createdAt' | 'updatedAt'>,
