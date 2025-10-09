@@ -3,7 +3,6 @@ import {
   addDoc,
   collection,
   doc,
-  getDoc,
   onSnapshot,
   query,
   updateDoc,
@@ -83,19 +82,19 @@ export class PlantacaoService {
   marcarComoColhida(plantacaoId: string): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
     const plantacaoRef = doc(firestore, 'plantacoes', plantacaoId);
-    
+
     const atualizacao = {
       colhida: true,
       dataColheita: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
-    
+
     return from(updateDoc(plantacaoRef, atualizacao));
   }
 
   atualizarQuantidadeInsumo(
     compraId: string,
-    cooperadoUid: string,
+    fazendaId: string,
     quantidadePlantada: number
   ): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
@@ -116,7 +115,7 @@ export class PlantacaoService {
 
           // Encontrar o item do usuário específico
           const itemIndex = itens.findIndex(
-            (item: any) => item.cooperadoUid === cooperadoUid
+            (item: any) => item.fazendaId === fazendaId
           );
 
           if (itemIndex === -1) {
