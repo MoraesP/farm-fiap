@@ -50,6 +50,7 @@
                 <th>Capacidade</th>
                 <th>Utilização</th>
                 <th>Última Atualização</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -81,6 +82,15 @@
                   </div>
                 </td>
                 <td>{{ formatarData(local.updatedAt) }}</td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-outline-success"
+                    (click)="abrirModalVenda(local)"
+                    title="Vender produto"
+                  >
+                    <i class="fas fa-dollar-sign me-1"></i> Vender
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -89,3 +99,148 @@
     </div>
   </div>
 </div>
+
+<div
+  class="modal"
+  [class.show]="mostrarModalVenda"
+  [style.display]="mostrarModalVenda ? 'block' : 'none'"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Vender Produto</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="fecharModalVenda()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="vendaForm" (ngSubmit)="confirmarVenda()">
+          <div class="mb-3">
+            <label class="form-label">Local de Armazenamento</label>
+            <input
+              type="text"
+              class="form-control"
+              [value]="localSelecionado?.nome"
+              disabled
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Produto</label>
+            <input
+              type="text"
+              class="form-control"
+              [value]="produtoNome"
+              disabled
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Quantidade Disponível</label>
+            <input
+              type="text"
+              class="form-control"
+              [value]="
+                localSelecionado?.capacidadeUtilizada +
+                ' ' +
+                localSelecionado?.tipoArmazenamento
+              "
+              disabled
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="quantidadeVenda" class="form-label"
+              >Quantidade a Vender</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="quantidadeVenda"
+              formControlName="quantidade"
+              min="1"
+              [max]="localSelecionado?.capacidadeUtilizada"
+              [class.is-invalid]="
+                vendaForm.get('quantidade')?.invalid &&
+                vendaForm.get('quantidade')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="vendaForm.get('quantidade')?.errors?.['required']"
+            >
+              Quantidade é obrigatória.
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="vendaForm.get('quantidade')?.errors?.['min']"
+            >
+              Quantidade deve ser maior que zero.
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="vendaForm.get('quantidade')?.errors?.['max']"
+            >
+              Quantidade não pode exceder o disponível.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="regiaoVenda" class="form-label"
+              >Região de Destino</label
+            >
+            <select
+              class="form-select"
+              id="regiaoVenda"
+              formControlName="regiao"
+              [class.is-invalid]="
+                vendaForm.get('regiao')?.invalid &&
+                vendaForm.get('regiao')?.touched
+              "
+            >
+              <option [ngValue]="null" disabled>Selecione uma região</option>
+              <option *ngFor="let regiao of regioes" [value]="regiao">
+                {{ regiao }}
+              </option>
+            </select>
+            <div
+              class="invalid-feedback"
+              *ngIf="vendaForm.get('regiao')?.errors?.['required']"
+            >
+              Região é obrigatória.
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="fecharModalVenda()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="vendaForm.invalid || isLoading"
+          (click)="confirmarVenda()"
+        >
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          Confirmar Venda
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal-backdrop fade show"
+  *ngIf="mostrarModalVenda"
+  (click)="fecharModalVenda()"
+></div>

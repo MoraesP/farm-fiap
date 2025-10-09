@@ -1,7 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { LocalArmazenamento } from '../../core/models/armazenamento.model';
+import { RegiaoVenda, Venda } from '../../core/models/venda.model';
 import { ArmazenamentoService } from '../../core/services/armazenamento.service';
+import { ProdutoService } from '../../core/services/produto.service';
+import { VendaService } from '../../core/services/venda.service';
 import { UserStateService } from '../../core/state/user-state.service';
 import {
   FirebaseTimestamp,
@@ -11,7 +20,7 @@ import {
 @Component({
   selector: 'app-locais-em-uso',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './locais-em-uso.component.html',
   styleUrls: ['./locais-em-uso.component.scss'],
 })
@@ -20,10 +29,26 @@ export class LocaisEmUsoComponent implements OnInit {
   carregando = true;
   mensagemErro = '';
 
+  // Propriedades para o modal de venda
+  mostrarModalVenda = false;
+  localSelecionado: LocalArmazenamento | null = null;
+  produtoNome = '';
+  vendaForm: FormGroup;
+  isLoading = false;
+  regioes = Object.values(RegiaoVenda);
+
   constructor(
     private armazenamentoService: ArmazenamentoService,
-    private userState: UserStateService
-  ) {}
+    private userState: UserStateService,
+    private produtoService: ProdutoService,
+    private vendaService: VendaService,
+    private fb: FormBuilder
+  ) {
+    this.vendaForm = this.fb.group({
+      quantidade: [1, [Validators.required, Validators.min(1)]],
+      regiao: [null, [Validators.required]],
+    });
+  }
 
   ngOnInit(): void {
     this.carregarLocaisEmUso();
@@ -78,5 +103,104 @@ export class LocaisEmUsoComponent implements OnInit {
     } else {
       return 'bg-danger';
     }
+  }
+
+  // Métodos para o modal de venda
+  abrirModalVenda(local: LocalArmazenamento): void {
+    this.localSelecionado = local;
+
+    // Buscar o nome do produto
+    if (local.produtoId) {
+      this.produtoService.getProduto(local.produtoId).subscribe({
+        next: (produto) => {
+          if (produto) {
+            this.produtoNome = produto.nome;
+          } else {
+            this.produtoNome = 'Produto não encontrado';
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao buscar produto:', err);
+          this.produtoNome = 'Erro ao buscar produto';
+        },
+      });
+    }
+
+    // Configurar o formulário
+    this.vendaForm.reset({
+      quantidade: 1,
+      regiao: null,
+    });
+
+    // Configurar validadores dinâmicos
+    this.vendaForm
+      .get('quantidade')
+      ?.setValidators([
+        Validators.required,
+        Validators.min(1),
+        Validators.max(local.capacidadeUtilizada),
+      ]);
+    this.vendaForm.get('quantidade')?.updateValueAndValidity();
+
+    this.mostrarModalVenda = true;
+  }
+
+  fecharModalVenda(): void {
+    this.mostrarModalVenda = false;
+    this.localSelecionado = null;
+    this.produtoNome = '';
+  }
+
+  confirmarVenda(): void {
+    if (this.vendaForm.invalid || !this.localSelecionado) {
+      this.vendaForm.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading = true;
+    this.mensagemErro = '';
+
+    const formData = this.vendaForm.value;
+    const local = this.localSelecionado;
+
+    if (!local.produtoId || !local.fazendaId) {
+      this.mensagemErro = 'Dados do produto ou fazenda não encontrados.';
+      this.isLoading = false;
+      return;
+    }
+
+    const usuarioAtual = this.userState.usuarioAtual;
+    if (!usuarioAtual || !usuarioAtual.fazenda) {
+      this.mensagemErro = 'Usuário não está associado a uma fazenda.';
+      this.isLoading = false;
+      return;
+    }
+
+    // Preparar dados da venda
+    const venda: Omit<Venda, 'id' | 'createdAt' | 'updatedAt'> = {
+      produtoId: local.produtoId,
+      produtoNome: this.produtoNome,
+      quantidade: formData.quantidade,
+      regiao: formData.regiao,
+      localArmazenamentoId: local.id!,
+      fazendaId: local.fazendaId,
+      fazendaNome: local.fazendaNome || usuarioAtual.fazenda.nome,
+      dataVenda: new Date(),
+    };
+
+    // Registrar a venda
+    this.vendaService.registrarVenda(venda, local).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.fecharModalVenda();
+        this.carregarLocaisEmUso();
+      },
+      error: (err) => {
+        console.error('Erro ao registrar venda:', err);
+        this.mensagemErro =
+          'Não foi possível registrar a venda. Tente novamente mais tarde.';
+        this.isLoading = false;
+      },
+    });
   }
 }
