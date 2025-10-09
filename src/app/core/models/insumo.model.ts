@@ -31,25 +31,24 @@ export interface CompraInsumo {
 }
 
 export enum StatusCompra {
-  PENDENTE = 'PENDENTE',
-  CONCLUIDA = 'CONCLUIDA',
-  CANCELADA = 'CANCELADA',
+  PENDENTE = 'Pendente',
+  CONCLUIDA = 'Concluída',
+  CANCELADA = 'Cancelada',
 }
 
 export enum TipoInsumo {
-  SEMENTE = 'SEMENTE',
-  FERTILIZANTE = 'FERTILIZANTE',
-  RACAO = 'RACAO',
-  DEFENSIVO = 'DEFENSIVO',
-  OUTRO = 'OUTRO',
+  SEMENTE = 'Semente',
+  FERTILIZANTE = 'Fertilizante',
+  RACAO = 'Ração',
+  OUTRO = 'Outro',
 }
 
 export enum UnidadeMedida {
-  KG = 'kg',
-  G = 'g',
-  L = 'l',
-  ML = 'ml',
-  UN = 'un',
-  CX = 'cx',
-  SC = 'sc',
+  KG = 'Kilograma(s)',
+  G = 'Grama(s)',
+  L = 'Litro(s)',
+  ML = 'Mililitro(s)',
+  UN = 'Unidade(s)',
+  CX = 'Caixa(s)',
+  SC = 'Saca(s)',
 }

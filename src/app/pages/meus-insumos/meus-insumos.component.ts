@@ -38,14 +38,15 @@ interface InsumoComprado {
 })
 export class MeusInsumosComponent implements OnInit {
   insumosComprados: InsumoComprado[] = [];
-  carregando = true;
 
   mensagemErro = '';
   mensagemSucesso = '';
 
-  // Modal de plantio
+  carregando = true;
   modalPlantarAberto = false;
-  insumoCompradoSelecionado: InsumoComprado | null = null;
+
+  insumoCompradoSelecionado: InsumoComprado = null;
+
   plantarForm: FormGroup;
 
   constructor(
@@ -134,11 +135,9 @@ export class MeusInsumosComponent implements OnInit {
     return formatarData(data);
   }
 
-  // Métodos para o modal de plantio
   abrirModalPlantar(insumo: InsumoComprado): void {
     this.insumoCompradoSelecionado = insumo;
 
-    // Atualizar o validador de quantidade máxima
     this.plantarForm
       .get('quantidade')
       ?.setValidators([
@@ -157,7 +156,6 @@ export class MeusInsumosComponent implements OnInit {
 
   fecharModalPlantar(): void {
     this.modalPlantarAberto = false;
-    this.insumoCompradoSelecionado = null;
   }
 
   confirmarPlantar(): void {
@@ -192,8 +190,8 @@ export class MeusInsumosComponent implements OnInit {
         next: () => {
           this.plantacaoService
             .atualizarQuantidadeInsumo(
-              this.insumoCompradoSelecionado!.compraId,
-              this.userState.usuarioAtual!.uid,
+              this.insumoCompradoSelecionado.compraId,
+              this.userState.usuarioAtual.uid,
               quantidadePlantar
             )
             .subscribe({
@@ -203,11 +201,11 @@ export class MeusInsumosComponent implements OnInit {
                 } de ${
                   this.insumoCompradoSelecionado!.nome
                 } registrado com sucesso!`;
+                this.insumoCompradoSelecionado = null;
               },
             });
 
           this.fecharModalPlantar();
-
           setTimeout(() => {
             this.mensagemSucesso = '';
           }, 3000);
@@ -220,7 +218,7 @@ export class MeusInsumosComponent implements OnInit {
       });
   }
 
-  getQuantidadeRestante(insumoComprado: InsumoComprado | null) {
+  getQuantidadeRestante(insumoComprado: InsumoComprado) {
     return (
       (insumoComprado?.quantidadeComprada || 0) -
       (insumoComprado?.quantidadeUsada || 0)

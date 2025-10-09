@@ -24,7 +24,6 @@ import { FirebaseService } from './firebase.service';
 })
 export class ArmazenamentoService {
   private readonly COLECAO = 'locais_armazenamento';
-  private readonly COLECAO_OCUPACAO = 'armazenamento_ocupacao';
 
   constructor(private firebaseService: FirebaseService) {}
 
@@ -47,45 +46,7 @@ export class ArmazenamentoService {
               tipoArmazenamento: data['tipoArmazenamento'],
               capacidadeMaxima: data['capacidadeMaxima'],
               capacidadeUtilizada: data['capacidadeUtilizada'],
-              fazendaId: data['fazendaId'],
-              fazendaNome: data['fazendaNome'],
-              createdAt: data['createdAt']?.toDate(),
-              updatedAt: data['updatedAt']?.toDate(),
-            } as LocalArmazenamento;
-          });
-          observer.next(locais);
-        },
-        (error) => {
-          observer.error(error);
-        }
-      );
-
-      return { unsubscribe };
-    });
-  }
-
-  /**
-   * Obtém locais de armazenamento por fazenda
-   */
-  obterLocaisArmazenamentoPorFazenda(
-    fazendaId: string
-  ): Observable<LocalArmazenamento[]> {
-    const firestore = this.firebaseService.getFirestore();
-    const locaisRef = collection(firestore, this.COLECAO);
-    const q = query(locaisRef, where('fazendaId', '==', fazendaId));
-
-    return new Observable<LocalArmazenamento[]>((observer) => {
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const locais = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              nome: data['nome'],
-              tipoArmazenamento: data['tipoArmazenamento'],
-              capacidadeMaxima: data['capacidadeMaxima'],
-              capacidadeUtilizada: data['capacidadeUtilizada'],
+              produtoId: data['produtoId'],
               fazendaId: data['fazendaId'],
               fazendaNome: data['fazendaNome'],
               createdAt: data['createdAt']?.toDate(),
@@ -158,78 +119,5 @@ export class ArmazenamentoService {
     const localRef = doc(firestore, this.COLECAO, id);
 
     return from(deleteDoc(localRef));
-  }
-
-  /**
-   * Adiciona ocupação a um local de armazenamento
-   */
-  adicionarOcupacao(
-    localId: string,
-    ocupacao: ArmazenamentoOcupacao
-  ): Observable<void> {
-    const firestore = this.firebaseService.getFirestore();
-
-    return from(getDoc(doc(firestore, this.COLECAO, localId))).pipe(
-      switchMap((docSnap) => {
-        if (!docSnap.exists()) {
-          throw new Error('Local de armazenamento não encontrado');
-        }
-
-        const localData = docSnap.data() as LocalArmazenamento;
-        const novaCapacidade =
-          localData.capacidadeUtilizada + ocupacao.quantidade;
-
-        if (novaCapacidade > localData.capacidadeMaxima) {
-          throw new Error('Capacidade máxima excedida');
-        }
-
-        // Atualizar a capacidade utilizada
-        const updatePromise = updateDoc(doc(firestore, this.COLECAO, localId), {
-          capacidadeUtilizada: novaCapacidade,
-          updatedAt: Timestamp.now(),
-        });
-
-        // Registrar a ocupação
-        const ocupacaoData = {
-          ...ocupacao,
-          localArmazenamentoId: localId,
-          dataArmazenamento: Timestamp.now(),
-        };
-
-        const addPromise = addDoc(
-          collection(firestore, this.COLECAO_OCUPACAO),
-          ocupacaoData
-        );
-
-        // Retornar um Observable vazio após ambas as operações serem concluídas
-        return from(Promise.all([updatePromise, addPromise])).pipe(
-          map(() => undefined)
-        );
-      })
-    );
-  }
-
-  /**
-   * Obtém a ocupação de um local de armazenamento
-   */
-  obterOcupacao(localId: string): Observable<ArmazenamentoOcupacao[]> {
-    const firestore = this.firebaseService.getFirestore();
-    const ocupacaoRef = collection(firestore, this.COLECAO_OCUPACAO);
-    const q = query(ocupacaoRef, where('localArmazenamentoId', '==', localId));
-
-    return from(getDocs(q)).pipe(
-      map((snapshot) => {
-        return snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            insumoId: data['insumoId'],
-            insumoNome: data['insumoNome'],
-            quantidade: data['quantidade'],
-            dataArmazenamento: data['dataArmazenamento'].toDate(),
-          } as ArmazenamentoOcupacao & { id: string };
-        });
-      })
-    );
   }
 }

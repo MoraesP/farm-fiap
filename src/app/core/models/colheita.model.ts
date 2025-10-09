@@ -2,11 +2,12 @@ import { UnidadeMedida } from './insumo.model';
 
 export interface ProdutoColhido {
   id?: string;
-  nome: string;
-  tipo: UnidadeMedida;
+  insumoId: string;
+  produtoId: string;
+  produtoNome: string;
+  produtoUnidadeMedida: UnidadeMedida;
   quantidade: number;
   plantacaoId: string;
-  plantacaoNome: string;
   localArmazenamentoId: string;
   localArmazenamentoNome: string;
   fazendaId: string;

@@ -1,0 +1,73 @@
+// Estilos para o componente de produtos
+.container-fluid {
+  padding: 1rem;
+}
+
+// Estilos para os cards
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 1.5rem;
+
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  }
+}
+
+// Estilos para a tabela
+.table {
+  th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+  }
+
+  td,
+  th {
+    vertical-align: middle;
+  }
+}
+
+.modal-backdrop {
+  z-index: 1040;
+}
+
+.modal-dialog {
+  z-index: 1050;
+}
+
+// Estilos para o modal
+.modal {
+  .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  }
+
+  .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+  }
+}
+
+// Estilos para os botões
+.btn-success {
+  &:hover {
+    background-color: darken(#28a745, 10%);
+  }
+}
+
+.btn-danger {
+  &:hover {
+    background-color: darken(#dc3545, 10%);
+  }
+}
+
+// Estilos para mensagens de feedback
+.alert {
+  margin-bottom: 1rem;
+}
+
+// Estilos para o estado de carregamento
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}

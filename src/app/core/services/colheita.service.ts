@@ -42,11 +42,12 @@ export class ColheitaService {
             const data = doc.data();
             return {
               id: doc.id,
-              nome: data['nome'],
-              tipo: data['tipo'],
+              insumoId: data['insumoId'],
+              produtoId: data['produtoId'],
+              produtoNome: data['produtoNome'],
+              produtoUnidadeMedida: data['produtoUnidadeMedida'],
               quantidade: data['quantidade'],
               plantacaoId: data['plantacaoId'],
-              plantacaoNome: data['plantacaoNome'],
               localArmazenamentoId: data['localArmazenamentoId'],
               localArmazenamentoNome: data['localArmazenamentoNome'],
               fazendaId: data['fazendaId'],
@@ -71,7 +72,7 @@ export class ColheitaService {
    * Registra um novo produto colhido e atualiza o local de armazenamento
    */
   registrarColheita(
-    produto: Omit<ProdutoColhido, 'id' | 'createdAt' | 'updatedAt'>,
+    produtoColhido: Omit<ProdutoColhido, 'id' | 'createdAt' | 'updatedAt'>,
     local: LocalArmazenamento
   ): Observable<ProdutoColhido> {
     const firestore = this.firebaseService.getFirestore();
@@ -80,17 +81,19 @@ export class ColheitaService {
 
     // Preparar dados do produto
     const novoProduto = {
-      ...produto,
-      dataColheita: Timestamp.fromDate(produto.dataColheita),
+      ...produtoColhido,
+      dataColheita: Timestamp.fromDate(produtoColhido.dataColheita),
       createdAt: agora,
       updatedAt: agora,
     };
 
     // Atualizar local de armazenamento
     const localAtualizado: Partial<LocalArmazenamento> = {
-      capacidadeUtilizada: local.capacidadeUtilizada + produto.quantidade,
-      fazendaId: produto.fazendaId,
-      fazendaNome: produto.fazendaNome,
+      capacidadeUtilizada:
+        local.capacidadeUtilizada + produtoColhido.quantidade,
+      produtoId: produtoColhido.produtoId,
+      fazendaId: produtoColhido.fazendaId,
+      fazendaNome: produtoColhido.fazendaNome,
       updatedAt: new Date(),
     };
 
@@ -103,7 +106,9 @@ export class ColheitaService {
     ).pipe(
       // Marcar a plantação como colhida
       switchMap(() => {
-        return this.plantacaoService.marcarComoColhida(produto.plantacaoId);
+        return this.plantacaoService.marcarComoColhida(
+          produtoColhido.plantacaoId
+        );
       }),
       // Depois registrar o produto colhido
       switchMap(() => {
@@ -111,7 +116,7 @@ export class ColheitaService {
           map((docRef) => {
             return {
               id: docRef.id,
-              ...produto,
+              ...produtoColhido,
               createdAt: agora.toDate(),
               updatedAt: agora.toDate(),
             };

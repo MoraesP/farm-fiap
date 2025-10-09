@@ -6,6 +6,7 @@ export interface LocalArmazenamento {
   tipoArmazenamento: UnidadeMedida;
   capacidadeMaxima: number;
   capacidadeUtilizada: number;
+  produtoId?: string;
   fazendaId?: string;
   fazendaNome?: string;
   createdAt?: Date;

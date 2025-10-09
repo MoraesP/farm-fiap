@@ -114,51 +114,55 @@
             </div>
 
             <div class="mb-3">
-              <label for="nomeProduto" class="form-label"
-                >Nome do Produto Colhido</label
+              <label for="produtoId" class="form-label"
+                >Produto a ser colhido</label
               >
-              <input
-                type="text"
-                class="form-control"
-                id="nomeProduto"
-                formControlName="nomeProduto"
-                [class.is-invalid]="
-                  colheitaForm.get('nomeProduto')?.invalid &&
-                  colheitaForm.get('nomeProduto')?.touched
-                "
-              />
-              <div
-                class="invalid-feedback"
-                *ngIf="colheitaForm.get('nomeProduto')?.errors?.['required']"
-              >
-                Nome do produto é obrigatório.
+              <div *ngIf="carregandoProdutos" class="text-center py-2">
+                <div
+                  class="spinner-border spinner-border-sm text-success"
+                  role="status"
+                >
+                  <span class="visually-hidden">Carregando produtos...</span>
+                </div>
+                <small class="ms-2">Carregando produtos disponíveis...</small>
               </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="tipoProduto" class="form-label"
-                >Tipo do Produto</label
-              >
               <select
+                *ngIf="!carregandoProdutos"
                 class="form-select"
-                id="tipoProduto"
-                formControlName="tipoProduto"
+                id="produtoId"
+                formControlName="produtoId"
                 [class.is-invalid]="
-                  colheitaForm.get('tipoProduto')?.invalid &&
-                  colheitaForm.get('tipoProduto')?.touched
+                  colheitaForm.get('produtoId')?.invalid &&
+                  colheitaForm.get('produtoId')?.touched
                 "
               >
-                <option [ngValue]="null" disabled>Selecione um tipo</option>
-                <option *ngFor="let tipo of unidadesMedida" [value]="tipo">
-                  {{ tipo }}
+                <option [ngValue]="null" disabled>
+                  {{
+                    produtosDisponiveis.length === 0
+                      ? "Nenhum produto disponível para este insumo"
+                      : "Selecione um produto"
+                  }}
+                </option>
+                <option
+                  *ngFor="let produto of produtosDisponiveis"
+                  [value]="produto.id"
+                >
+                  {{ produto.nome }} ({{ produto.unidadeMedida }})
                 </option>
               </select>
               <div
                 class="invalid-feedback"
-                *ngIf="colheitaForm.get('tipoProduto')?.errors?.['required']"
+                *ngIf="colheitaForm.get('produtoId')?.errors?.['required']"
               >
-                Tipo do produto é obrigatório.
+                Selecione um produto para colheita.
               </div>
+              <small
+                class="form-text text-muted"
+                *ngIf="produtosDisponiveis.length === 0 && !carregandoProdutos"
+              >
+                Não há produtos cadastrados para este insumo. Cadastre um
+                produto primeiro na seção "Produtos".
+              </small>
             </div>
 
             <div class="mb-3">
@@ -203,14 +207,14 @@
                   colheitaForm.get('localArmazenamentoId')?.touched
                 "
                 [disabled]="
-                  !colheitaForm.get('tipoProduto')?.value ||
+                  !colheitaForm.get('produtoId')?.value ||
                   locaisFiltrados.length === 0
                 "
               >
                 <option [ngValue]="null" disabled>
                   {{
-                    !colheitaForm.get("tipoProduto")?.value
-                      ? "Selecione primeiro o tipo do produto"
+                    !colheitaForm.get("produtoId")?.value
+                      ? "Selecione primeiro um produto"
                       : locaisFiltrados.length === 0
                       ? "Nenhum local disponível para este tipo"
                       : "Selecione um local"

@@ -25,7 +25,7 @@ export class HeaderComponent {
     return this.userState.usuarioAtual;
   }
 
-  getPerfilNome = (perfil: Perfil) => {
+  getPerfilNome = (perfil?: Perfil) => {
     switch (perfil) {
       case Perfil.COOPERADO:
         return 'Cooperado';

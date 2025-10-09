@@ -37,12 +37,16 @@ export class SidebarComponent implements OnInit {
 
   configurarMenuItems(): void {
     this.menuItems = [{ id: 'home', title: 'Início', icon: 'fa-home' }];
-
     this.menuItems.push({
       id: 'insumos',
       title: 'Insumos',
       icon: 'fa-seedling',
       perfilPermitido: [Perfil.COOPERADO],
+    });
+    this.menuItems.push({
+      id: 'produtos',
+      title: 'Produtos',
+      icon: 'fa-box',
     });
 
     if (this.userState.usuarioAtual?.perfil === Perfil.COOPERADO) {

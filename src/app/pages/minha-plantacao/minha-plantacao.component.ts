@@ -10,9 +10,11 @@ import { LocalArmazenamento } from '../../core/models/armazenamento.model';
 import { ProdutoColhido } from '../../core/models/colheita.model';
 import { UnidadeMedida } from '../../core/models/insumo.model';
 import { Plantacao } from '../../core/models/plantacao.model';
+import { Produto } from '../../core/models/produto.model';
 import { ArmazenamentoService } from '../../core/services/armazenamento.service';
 import { ColheitaService } from '../../core/services/colheita.service';
 import { PlantacaoService } from '../../core/services/plantacao.service';
+import { ProdutoService } from '../../core/services/produto.service';
 import { UserStateService } from '../../core/state/user-state.service';
 import {
   FirebaseTimestamp,
@@ -28,28 +30,34 @@ import {
 })
 export class MinhaPlantacaoComponent implements OnInit {
   plantacoes: Plantacao[] = [];
-  carregando = true;
+
   mensagemErro = '';
 
-  // Dados para colheita
-  mostrarModalColheita = false;
-  plantacaoSelecionada: Plantacao | null = null;
-  colheitaForm: FormGroup;
-  locaisArmazenamento: LocalArmazenamento[] = [];
-  locaisFiltrados: LocalArmazenamento[] = [];
-  unidadesMedida = Object.values(UnidadeMedida);
+  carregando = true;
   isLoadingColheita = false;
+  mostrarModalColheita = false;
+  carregandoProdutos = false;
+
+  plantacaoSelecionada: Plantacao = null;
+
+  colheitaForm: FormGroup;
+
+  produtosDisponiveis: Produto[] = [];
+  locaisFiltrados: LocalArmazenamento[] = [];
+  locaisArmazenamento: LocalArmazenamento[] = [];
+
+  unidadesMedida = Object.values(UnidadeMedida);
 
   constructor(
-    private plantacaoService: PlantacaoService,
-    private userState: UserStateService,
     private fb: FormBuilder,
-    private armazenamentoService: ArmazenamentoService,
-    private colheitaService: ColheitaService
+    private userState: UserStateService,
+    private produtoService: ProdutoService,
+    private colheitaService: ColheitaService,
+    private plantacaoService: PlantacaoService,
+    private armazenamentoService: ArmazenamentoService
   ) {
     this.colheitaForm = this.fb.group({
-      nomeProduto: ['', [Validators.required]],
-      tipoProduto: ['', [Validators.required]],
+      produtoId: ['', [Validators.required]],
       quantidade: [0, [Validators.required, Validators.min(1)]],
       localArmazenamentoId: ['', [Validators.required]],
     });
@@ -59,9 +67,39 @@ export class MinhaPlantacaoComponent implements OnInit {
     this.carregarPlantacoes();
     this.carregarLocaisArmazenamento();
 
-    // Observar mudanças no tipo de produto para filtrar locais compatíveis
-    this.colheitaForm.get('tipoProduto')?.valueChanges.subscribe((tipo) => {
-      this.filtrarLocaisArmazenamento(tipo);
+    this.colheitaForm.get('produtoId')?.valueChanges.subscribe((produtoId) => {
+      if (produtoId) {
+        const produtoSelecionado = this.produtosDisponiveis.find(
+          (p) => p.id === produtoId
+        );
+        if (produtoSelecionado) {
+          this.filtrarLocaisArmazenamento(produtoSelecionado.unidadeMedida, produtoId);
+        }
+      } else {
+        this.locaisFiltrados = [];
+      }
+    });
+  }
+
+  carregarProdutosPorInsumo(insumoId: string): void {
+    this.carregandoProdutos = true;
+    this.produtosDisponiveis = [];
+
+    this.produtoService.getProdutosPorInsumo(insumoId).subscribe({
+      next: (produtos) => {
+        this.produtosDisponiveis = produtos;
+        this.carregandoProdutos = false;
+
+        if (produtos.length === 0) {
+          this.mensagemErro =
+            'Não há produtos cadastrados para este insumo. Cadastre um produto primeiro.';
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao carregar produtos:', err);
+        this.mensagemErro = 'Erro ao carregar produtos relacionados ao insumo.';
+        this.carregandoProdutos = false;
+      },
     });
   }
 
@@ -96,7 +134,7 @@ export class MinhaPlantacaoComponent implements OnInit {
     });
   }
 
-  filtrarLocaisArmazenamento(tipo: UnidadeMedida): void {
+  filtrarLocaisArmazenamento(tipo: UnidadeMedida, produtoId: string): void {
     if (!tipo) {
       this.locaisFiltrados = [];
       return;
@@ -107,16 +145,22 @@ export class MinhaPlantacaoComponent implements OnInit {
       return;
     }
 
-    // Filtrar locais que são do mesmo tipo do produto e que:
-    // 1. Não têm fazenda associada, ou
-    // 2. Estão associados à mesma fazenda do usuário
     this.locaisFiltrados = this.locaisArmazenamento.filter((local) => {
-      const mesmoTipo = local.tipoArmazenamento === tipo;
       const semFazenda = !local.fazendaId;
       const mesmaFazenda = local.fazendaId === usuarioAtual.fazenda?.id;
+      const mesmoTipo = local.tipoArmazenamento === tipo;
       const temEspaco = local.capacidadeUtilizada < local.capacidadeMaxima;
+      const semProduto = !local.produtoId;
+      const mesmoProdutoJaArmazenado = produtoId
+        ? local.produtoId === produtoId
+        : false;
 
-      return mesmoTipo && temEspaco && (semFazenda || mesmaFazenda);
+      return (
+        mesmoTipo &&
+        temEspaco &&
+        (semFazenda || mesmaFazenda) &&
+        (semProduto || mesmoProdutoJaArmazenado)
+      );
     });
   }
 
@@ -142,17 +186,20 @@ export class MinhaPlantacaoComponent implements OnInit {
 
     this.plantacaoSelecionada = plantacao;
     this.colheitaForm.reset({
-      nomeProduto: '',
-      tipoProduto: '',
+      produtoId: '',
       quantidade: 0,
       localArmazenamentoId: '',
     });
+
+    this.carregarProdutosPorInsumo(plantacao.insumoId);
+
     this.mostrarModalColheita = true;
   }
 
   fecharModalColheita(): void {
     this.mostrarModalColheita = false;
     this.plantacaoSelecionada = null;
+    this.produtosDisponiveis = [];
   }
 
   colher(): void {
@@ -191,15 +238,26 @@ export class MinhaPlantacaoComponent implements OnInit {
       return;
     }
 
+    const produtoSelecionado = this.produtosDisponiveis.find(
+      (p) => p.id === formData.produtoId
+    );
+
+    if (!produtoSelecionado) {
+      this.mensagemErro = 'Produto não encontrado.';
+      this.isLoadingColheita = false;
+      return;
+    }
+
     const produtoColhido: Omit<
       ProdutoColhido,
       'id' | 'createdAt' | 'updatedAt'
     > = {
-      nome: formData.nomeProduto,
-      tipo: formData.tipoProduto,
+      insumoId: this.plantacaoSelecionada.insumoId,
+      produtoId: produtoSelecionado.id,
+      produtoNome: produtoSelecionado.nome,
+      produtoUnidadeMedida: produtoSelecionado.unidadeMedida,
       quantidade: formData.quantidade,
       plantacaoId: this.plantacaoSelecionada.id!,
-      plantacaoNome: this.plantacaoSelecionada.insumoNome,
       localArmazenamentoId: formData.localArmazenamentoId,
       localArmazenamentoNome: localSelecionado.nome,
       fazendaId: usuarioAtual.fazenda.id!,
