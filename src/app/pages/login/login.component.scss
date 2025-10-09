@@ -1,0 +1,44 @@
+@import "../../../app/styles/variables";
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px 0 rgba(51, 60, 78, 0.15);
+  border-color: $border-color;
+  background-color: $color-background;
+}
+
+.btn-primary {
+  background-color: $color-primary;
+  border-color: $color-primary;
+
+  &:hover,
+  &:focus {
+    background-color: $color-primary-dark;
+    border-color: $color-primary-dark;
+  }
+}
+
+.btn-outline-danger {
+  color: $color-tertiary;
+  border-color: $color-tertiary;
+
+  &:hover,
+  &:focus {
+    background-color: $color-tertiary;
+    color: $color-background;
+  }
+}
+
+a {
+  color: $color-secondary;
+
+  &:hover {
+    color: $color-secondary-dark;
+  }
+}
+
+.form-control:focus {
+  border-color: $color-primary;
+  box-shadow: 0 0 0 0.25rem rgba($color-primary, 0.25);
+}

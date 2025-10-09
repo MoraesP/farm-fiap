@@ -1,9 +1,9 @@
-<div class="sidebar-container bg-dark text-white d-flex flex-column">
+<div class="sidebar-container text-white d-flex flex-column">
   <div class="sidebar-header p-3 text-center">
     <img src="/logo.png" alt="FIAP & MORAES FARMS" class="img-fluid" />
     <h6>Cooperativa de fazendas</h6>
   </div>
-  <ul class="nav nav-pills flex-column mb-auto p-2">
+  <ul class="nav nav-pills flex-column mb-auto p-3">
     <li class="nav-item" *ngFor="let item of menuItems">
       <a
         (click)="navegar(item.id)"

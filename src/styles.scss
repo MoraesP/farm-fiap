@@ -1,3 +1,12 @@
+@import "app/styles/variables";
+
+$body-bg: $color-background;
+$body-color: $color-font;
+$primary: $color-primary;
+$secondary: $color-secondary;
+$info: $color-tertiary;
+$link-color: $color-secondary;
+
 @import "bootstrap/scss/bootstrap";
 
 html,
@@ -11,8 +20,8 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: $color-background;
+  color: $color-font;
 }
 
 *,
@@ -27,14 +36,20 @@ h3,
 h4,
 h5,
 h6 {
-  margin-top: 0;
+  margin: 0;
+  color: $color-font;
 }
 
 a {
-  color: #4a90e2;
+  color: $color-secondary;
   text-decoration: none;
 
   &:hover {
     text-decoration: underline;
+    color: $color-secondary-dark;
   }
+}
+
+table {
+  margin-bottom: 0 !important;
 }

@@ -49,7 +49,9 @@
           </div>
 
           <div class="mb-3">
-            <label for="dataNascimento" class="form-label">Data de Nascimento</label>
+            <label for="dataNascimento" class="form-label"
+              >Data de Nascimento</label
+            >
             <input
               type="date"
               id="dataNascimento"
@@ -67,7 +69,9 @@
                 perfilForm.get('dataNascimento')?.touched
               "
             >
-              <span *ngIf="perfilForm.get('dataNascimento')?.errors?.['required']">
+              <span
+                *ngIf="perfilForm.get('dataNascimento')?.errors?.['required']"
+              >
                 Data de nascimento é obrigatória.
               </span>
               <span
@@ -75,12 +79,49 @@
               >
                 Data de nascimento inválida.
               </span>
-              <span *ngIf="perfilForm.get('dataNascimento')?.errors?.['futureDate']">
+              <span
+                *ngIf="perfilForm.get('dataNascimento')?.errors?.['futureDate']"
+              >
                 Data de nascimento não pode ser no futuro.
               </span>
-              <span *ngIf="perfilForm.get('dataNascimento')?.errors?.['minAge']">
+              <span
+                *ngIf="perfilForm.get('dataNascimento')?.errors?.['minAge']"
+              >
                 Você deve ter pelo menos {{ IDADE_MINIMA }} anos.
               </span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="perfil" class="form-label">Eu sou</label>
+            <select id="perfil" formControlName="perfil" class="form-select">
+              <option *ngFor="let perfil of perfis" [value]="perfil">
+                {{ getPerfilNome(perfil) }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3" *ngIf="eCooperado">
+            <label for="fazenda" class="form-label">Minha Fazenda</label>
+            <select
+              id="fazenda"
+              formControlName="fazenda"
+              class="form-select"
+              [class.is-invalid]="
+                perfilForm.get('fazenda')?.invalid &&
+                perfilForm.get('fazenda')?.touched
+              "
+            >
+              <option [ngValue]="null" disabled>Selecione uma fazenda</option>
+              <option *ngFor="let fazenda of fazendas" [ngValue]="fazenda">
+                {{ fazenda.nome }}
+              </option>
+            </select>
+            <div
+              class="invalid-feedback"
+              *ngIf="perfilForm.get('fazenda')?.errors?.['required']"
+            >
+              Por favor, selecione sua fazenda.
             </div>
           </div>
         </form>

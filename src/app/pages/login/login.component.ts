@@ -9,10 +9,10 @@ import {
 import { Router } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { Subscription } from 'rxjs';
+import { Fazenda, Perfil, PerfilUsuario } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserStateService } from '../../core/state/user-state.service';
 import { CompleteProfileModalComponent } from '../../shared/components/complete-profile-modal/complete-profile-modal.component';
-import { PerfilUsuario } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -93,7 +93,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleCompleteProfile(perfilData: { cpf: string; dataNascimento: string }): void {
+  handleCompleteProfile(perfilData: {
+    cpf: string;
+    dataNascimento: string;
+    perfil: Perfil;
+    fazenda: Fazenda | null;
+  }): void {
     this.userState.completarPerfilUsuario(perfilData).subscribe({
       error: (error) => this.handleAuthError(error),
     });

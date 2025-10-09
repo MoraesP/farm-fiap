@@ -1,11 +1,25 @@
+@import "../../../app/styles/variables";
+
 .sidebar-container {
   height: 100%;
+  background-color: $color-secondary !important;
 }
 
 .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: $color-background !important;
+  background-color: $color-primary !important;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba($color-primary-light, 0.3);
+}
+
+.sidebar-header {
+  background-color: $color-background;
+  border-right: 1px solid $color-secondary;
+
+  h6 {
+    margin-top: 10px;
+    color: $color-font;
+  }
 }

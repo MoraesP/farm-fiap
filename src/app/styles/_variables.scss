@@ -1,0 +1,29 @@
+// Paleta de cores
+$color-font: #030506;
+$color-background: #FFFBF0;
+$color-primary: #968F4B;
+$color-secondary: #7A6248;
+$color-tertiary: #AB9597;
+
+// Variações de cores
+$color-primary-light: lighten($color-primary, 15%);
+$color-primary-dark: darken($color-primary, 15%);
+$color-secondary-light: lighten($color-secondary, 15%);
+$color-secondary-dark: darken($color-secondary, 15%);
+$color-tertiary-light: lighten($color-tertiary, 15%);
+$color-tertiary-dark: darken($color-tertiary, 15%);
+
+// Cores de estado
+$color-success: #4CAF50;
+$color-info: #2196F3;
+$color-warning: #FF9800;
+$color-danger: #F44336;
+
+// Cores de texto
+$text-color: $color-font;
+$text-muted: rgba($color-font, 0.6);
+$text-light: rgba($color-font, 0.87);
+
+// Cores de borda
+$border-color: rgba($color-font, 0.12);
+$border-color-light: rgba($color-font, 0.06);

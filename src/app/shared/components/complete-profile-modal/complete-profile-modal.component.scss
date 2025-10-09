@@ -1,4 +1,7 @@
+@import "../../../../app/styles/variables";
+
 .modal {
+  z-index: 1050;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -6,6 +9,10 @@
   z-index: 1040;
 }
 
-.modal {
-  z-index: 1050;
+.modal-content {
+  background-color: $color-background;
+}
+
+.modal-header {
+  border-bottom-color: $border-color;
 }

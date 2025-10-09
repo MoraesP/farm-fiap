@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { doc, setDoc } from 'firebase/firestore';
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { PerfilUsuario } from '../models/user.model';
+import { Fazenda, Perfil, PerfilUsuario } from '../models/user.model';
 import { FirebaseService } from '../services/firebase.service';
 
 @Injectable({
@@ -57,6 +57,8 @@ export class UserStateService {
   completarPerfilUsuario(perfilData: {
     cpf: string;
     dataNascimento: string;
+    perfil: Perfil;
+    fazenda: Fazenda | null;
   }): Observable<PerfilUsuario> {
     if (!this.usuarioPerfilGoogle) {
       throw new Error('Nenhum usuário temporário para completar o perfil.');
@@ -97,9 +99,10 @@ export class UserStateService {
   get nomeUsuario(): string {
     if (!this.usuarioAtual) {
       return '';
-    };
+    }
     return (
-      `${this.usuarioAtual.primeiroNome} ${this.usuarioAtual.ultimoNome}`.trim() || this.usuarioAtual.email
+      `${this.usuarioAtual.primeiroNome} ${this.usuarioAtual.ultimoNome}`.trim() ||
+      this.usuarioAtual.email
     );
   }
 
