@@ -11,6 +11,7 @@ import { MinhaPlantacaoComponent } from '../pages/minha-plantacao/minha-plantaca
 import { ProdutosComponent } from '../pages/produtos/produtos.component';
 import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { PainelVendasComponent } from '../pages/painel-vendas/painel-vendas.component';
 
 @Component({
   selector: 'app-layout',
@@ -28,6 +29,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
     ArmazenamentoListComponent,
     LocaisEmUsoComponent,
     ProdutosComponent,
+    PainelVendasComponent,
   ],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],

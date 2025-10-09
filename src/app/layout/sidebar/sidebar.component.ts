@@ -68,6 +68,12 @@ export class SidebarComponent implements OnInit {
         icon: 'fa-warehouse',
         perfilPermitido: [Perfil.COOPERADO],
       });
+      this.menuItems.push({
+        id: 'painel-vendas',
+        title: 'Painel de Vendas',
+        icon: 'fa-chart-line',
+        perfilPermitido: [Perfil.COOPERADO],
+      });
     }
 
     if (this.userState.usuarioAtual?.perfil === Perfil.COOPERATIVA) {
