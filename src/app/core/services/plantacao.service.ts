@@ -17,11 +17,13 @@ import { FirebaseService } from './firebase.service';
   providedIn: 'root',
 })
 export class PlantacaoService {
+  private readonly PLANTACOES = 'plantacoes';
+
   constructor(private firebaseService: FirebaseService) {}
 
   getPlantacoes(fazendaId: string): Observable<Plantacao[]> {
     const firestore = this.firebaseService.getFirestore();
-    const plantacoesRef = collection(firestore, 'plantacoes');
+    const plantacoesRef = collection(firestore, this.PLANTACOES);
     const q = query(plantacoesRef, where('fazendaId', '==', fazendaId));
 
     return new Observable<Plantacao[]>((observer) => {
@@ -56,7 +58,7 @@ export class PlantacaoService {
     fazendaId: string
   ): Observable<Plantacao> {
     const firestore = this.firebaseService.getFirestore();
-    const plantacoesRef = collection(firestore, 'plantacoes');
+    const plantacoesRef = collection(firestore, this.PLANTACOES);
 
     const novaPlantacao: Omit<Plantacao, 'id'> = {
       compraId,
@@ -81,7 +83,7 @@ export class PlantacaoService {
 
   marcarComoColhida(plantacaoId: string): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const plantacaoRef = doc(firestore, 'plantacoes', plantacaoId);
+    const plantacaoRef = doc(firestore, this.PLANTACOES, plantacaoId);
 
     const atualizacao = {
       colhida: true,

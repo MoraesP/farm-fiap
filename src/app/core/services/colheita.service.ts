@@ -18,7 +18,7 @@ import { PlantacaoService } from './plantacao.service';
   providedIn: 'root',
 })
 export class ColheitaService {
-  private readonly COLECAO = 'produtos_colhidos';
+  private readonly PRODUTOS_COLHIDOS = 'produtos_colhidos';
 
   constructor(
     private firebaseService: FirebaseService,
@@ -31,7 +31,7 @@ export class ColheitaService {
    */
   obterProdutosColhidos(fazendaId: string): Observable<ProdutoColhido[]> {
     const firestore = this.firebaseService.getFirestore();
-    const produtosRef = collection(firestore, this.COLECAO);
+    const produtosRef = collection(firestore, this.PRODUTOS_COLHIDOS);
     const q = query(produtosRef, where('fazendaId', '==', fazendaId));
 
     return new Observable<ProdutoColhido[]>((observer) => {
@@ -76,7 +76,7 @@ export class ColheitaService {
     local: LocalArmazenamento
   ): Observable<ProdutoColhido> {
     const firestore = this.firebaseService.getFirestore();
-    const produtosRef = collection(firestore, this.COLECAO);
+    const produtosRef = collection(firestore, this.PRODUTOS_COLHIDOS);
     const agora = Timestamp.now();
 
     // Preparar dados do produto

@@ -7,20 +7,22 @@ import {
   Timestamp,
   where,
 } from 'firebase/firestore';
-import { from, Observable, switchMap } from 'rxjs';
+import { from, Observable, switchMap, tap } from 'rxjs';
 import { LocalArmazenamento } from '../models/armazenamento.model';
 import { Venda } from '../models/venda.model';
 import { ArmazenamentoService } from './armazenamento.service';
 import { FirebaseService } from './firebase.service';
+import { NotificacaoService } from './notificacao.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class VendaService {
-  private readonly COLECAO = 'vendas';
+  private readonly VENDAS = 'vendas';
 
   constructor(
     private firebaseService: FirebaseService,
+    private notificacaoService: NotificacaoService,
     private armazenamentoService: ArmazenamentoService
   ) {}
 
@@ -32,7 +34,7 @@ export class VendaService {
     local: LocalArmazenamento
   ): Observable<Venda> {
     const firestore = this.firebaseService.getFirestore();
-    const vendasRef = collection(firestore, this.COLECAO);
+    const vendasRef = collection(firestore, this.VENDAS);
     const agora = Timestamp.now();
 
     // Preparar dados da venda
@@ -46,6 +48,12 @@ export class VendaService {
     // Calcular nova capacidade utilizada
     const novaCapacidade = local.capacidadeUtilizada - venda.quantidade;
 
+    const localFicaraVazio = novaCapacidade <= 0;
+
+    const produtoNome = venda.produtoNome;
+    const localNome = local.nome;
+    const localId = local.id;
+
     // Preparar atualização do local de armazenamento
     const localAtualizado: Partial<LocalArmazenamento> = {
       capacidadeUtilizada: novaCapacidade,
@@ -53,7 +61,7 @@ export class VendaService {
     };
 
     // Se vendeu tudo, remover as referências ao produto e fazenda
-    if (novaCapacidade <= 0) {
+    if (localFicaraVazio) {
       localAtualizado.produtoId = null;
       localAtualizado.fazendaId = null;
       localAtualizado.fazendaNome = null;
@@ -67,15 +75,25 @@ export class VendaService {
         localAtualizado
       )
     ).pipe(
+      tap(() => {
+        if (localFicaraVazio && localId && localNome && produtoNome) {
+          this.notificacaoService
+            .notificarLocalDisponivel(localId, localNome, produtoNome)
+            .catch((error) =>
+              console.error(
+                'Erro ao enviar notificação de local disponível:',
+                error
+              )
+            );
+        }
+      }),
       // Depois registrar a venda
       switchMap(() => {
         return from(addDoc(vendasRef, novaVenda)).pipe(
           switchMap((docRef) => {
             // Retornar os dados da venda com o ID
             return from(
-              getDocs(
-                query(vendasRef, where('__name__', '==', docRef.id))
-              )
+              getDocs(query(vendasRef, where('__name__', '==', docRef.id)))
             ).pipe(
               switchMap((snapshot) => {
                 if (snapshot.docs.length > 0) {
@@ -110,7 +128,7 @@ export class VendaService {
    */
   obterVendas(fazendaId: string): Observable<Venda[]> {
     const firestore = this.firebaseService.getFirestore();
-    const vendasRef = collection(firestore, this.COLECAO);
+    const vendasRef = collection(firestore, this.VENDAS);
     const q = query(vendasRef, where('fazendaId', '==', fazendaId));
 
     return from(getDocs(q)).pipe(

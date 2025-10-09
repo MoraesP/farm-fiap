@@ -18,7 +18,7 @@ import { FirebaseService } from './firebase.service';
   providedIn: 'root',
 })
 export class FazendaService {
-  private readonly COLECAO = 'fazendas';
+  private readonly FAZENDAS = 'fazendas';
 
   constructor(
     private firebaseService: FirebaseService,
@@ -33,7 +33,7 @@ export class FazendaService {
    */
   obterFazendas(): Observable<Fazenda[]> {
     const firestore = this.firebaseService.getFirestore();
-    const fazendasRef = collection(firestore, this.COLECAO);
+    const fazendasRef = collection(firestore, this.FAZENDAS);
 
     return from(getDocs(fazendasRef)).pipe(
       map((snapshot) => {
@@ -55,7 +55,7 @@ export class FazendaService {
    */
   obterTodasFazendas(): Observable<Fazenda[]> {
     const firestore = this.firebaseService.getFirestore();
-    const fazendasRef = collection(firestore, this.COLECAO);
+    const fazendasRef = collection(firestore, this.FAZENDAS);
 
     return from(getDocs(fazendasRef)).pipe(
       map((snapshot) => {
@@ -83,7 +83,7 @@ export class FazendaService {
     fazenda: Omit<Fazenda, 'id' | 'createdAt' | 'updatedAt'>
   ): Observable<Fazenda> {
     const firestore = this.firebaseService.getFirestore();
-    const fazendasRef = collection(firestore, this.COLECAO);
+    const fazendasRef = collection(firestore, this.FAZENDAS);
     const agora = Timestamp.now();
 
     const novaFazenda = {
@@ -112,7 +112,7 @@ export class FazendaService {
     fazenda: Partial<Omit<Fazenda, 'id' | 'createdAt'>>
   ): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const fazendaRef = doc(firestore, this.COLECAO, id);
+    const fazendaRef = doc(firestore, this.FAZENDAS, id);
 
     const dadosAtualizados = {
       ...fazenda,
@@ -127,7 +127,7 @@ export class FazendaService {
    */
   removerFazenda(id: string): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const fazendaRef = doc(firestore, this.COLECAO, id);
+    const fazendaRef = doc(firestore, this.FAZENDAS, id);
 
     return from(deleteDoc(fazendaRef));
   }
@@ -137,7 +137,7 @@ export class FazendaService {
    */
   obterFazendaPorId(id: string): Observable<Fazenda | null> {
     const firestore = this.firebaseService.getFirestore();
-    const fazendaRef = doc(firestore, this.COLECAO, id);
+    const fazendaRef = doc(firestore, this.FAZENDAS, id);
 
     return from(getDoc(fazendaRef)).pipe(
       map((docSnap) => {

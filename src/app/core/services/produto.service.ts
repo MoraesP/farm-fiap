@@ -18,7 +18,7 @@ import { FirebaseService } from './firebase.service';
   providedIn: 'root',
 })
 export class ProdutoService {
-  private readonly colecao = 'produtos';
+  private readonly PRODUTOS = 'produtos';
 
   constructor(private firebaseService: FirebaseService) {}
 
@@ -27,7 +27,7 @@ export class ProdutoService {
    */
   getProdutos(): Observable<Produto[]> {
     const firestore = this.firebaseService.getFirestore();
-    const produtosRef = collection(firestore, this.colecao);
+    const produtosRef = collection(firestore, this.PRODUTOS);
 
     return new Observable<Produto[]>((observer) => {
       const unsubscribe = onSnapshot(
@@ -53,7 +53,7 @@ export class ProdutoService {
    */
   getProduto(id: string): Observable<Produto | null> {
     const firestore = this.firebaseService.getFirestore();
-    const produtoDocRef = doc(firestore, this.colecao, id);
+    const produtoDocRef = doc(firestore, this.PRODUTOS, id);
     return from(getDoc(produtoDocRef)).pipe(
       map((docSnap) => {
         if (docSnap.exists()) {
@@ -72,7 +72,7 @@ export class ProdutoService {
     produto: Omit<Produto, 'id' | 'createdAt' | 'updatedAt'>
   ): Observable<Produto> {
     const firestore = this.firebaseService.getFirestore();
-    const produtosRef = collection(firestore, this.colecao);
+    const produtosRef = collection(firestore, this.PRODUTOS);
 
     const agora = new Date();
     const novoProduto: Omit<Produto, 'id'> = {
@@ -95,7 +95,7 @@ export class ProdutoService {
    */
   atualizarProduto(id: string, produto: Partial<Produto>): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const produtoDocRef = doc(firestore, this.colecao, id);
+    const produtoDocRef = doc(firestore, this.PRODUTOS, id);
 
     const dadosAtualizados = {
       ...produto,
@@ -111,7 +111,7 @@ export class ProdutoService {
    */
   removerProduto(id: string): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const produtoDocRef = doc(firestore, this.colecao, id);
+    const produtoDocRef = doc(firestore, this.PRODUTOS, id);
     return from(deleteDoc(produtoDocRef));
   }
 
@@ -121,7 +121,7 @@ export class ProdutoService {
    */
   getProdutosPorInsumo(insumoId: string): Observable<Produto[]> {
     const firestore = this.firebaseService.getFirestore();
-    const produtosRef = collection(firestore, this.colecao);
+    const produtosRef = collection(firestore, this.PRODUTOS);
 
     return new Observable<Produto[]>((observer) => {
       const unsubscribe = onSnapshot(

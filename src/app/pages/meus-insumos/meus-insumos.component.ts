@@ -164,6 +164,7 @@ export class MeusInsumosComponent implements OnInit {
 
     const quantidadePlantar = this.plantarForm.get('quantidade')
       ?.value as number;
+
     const usuarioAtual = this.userState.usuarioAtual;
 
     if (!usuarioAtual) {
@@ -186,7 +187,7 @@ export class MeusInsumosComponent implements OnInit {
           this.plantacaoService
             .atualizarQuantidadeInsumo(
               this.insumoCompradoSelecionado.compraId,
-              this.userState.usuarioAtual.uid,
+              this.userState.usuarioAtual.fazenda.id,
               quantidadePlantar
             )
             .subscribe({

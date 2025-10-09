@@ -1,3 +1,89 @@
 .navbar-custom {
-  padding: 6px 20px;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.btn-link {
+  color: #6c757d;
+  text-decoration: none;
+  padding: 0.25rem;
+
+  &:hover {
+    color: #343a40;
+  }
+}
+
+.notificacoes-dropdown {
+  width: 350px;
+  padding: 0;
+  max-height: 500px;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+  .dropdown-header {
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .notificacoes-container {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .notificacao-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f1f1;
+    white-space: normal;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+
+    &.nao-lida {
+      background-color: #e8f4fe;
+
+      &:hover {
+        background-color: #d8eafd;
+      }
+
+      .notificacao-titulo {
+        font-weight: bold;
+      }
+    }
+
+    .notificacao-icone {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #e9ecef;
+      border-radius: 50%;
+
+      i {
+        color: #6c757d;
+      }
+    }
+
+    .notificacao-conteudo {
+      flex: 1;
+    }
+
+    .notificacao-titulo {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .notificacao-mensagem {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+
+    .notificacao-data {
+      font-size: 0.75rem;
+      color: #adb5bd;
+    }
+  }
 }

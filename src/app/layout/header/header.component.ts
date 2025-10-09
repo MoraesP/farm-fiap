@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { UserStateService } from '../../core/state/user-state.service';
 import { Perfil } from '../../core/models/user.model';
+import {
+  Notificacao,
+  NotificacaoService,
+} from '../../core/services/notificacao.service';
+import { UserStateService } from '../../core/state/user-state.service';
 
 @Component({
   selector: 'app-header',
@@ -14,11 +16,11 @@ import { Perfil } from '../../core/models/user.model';
 })
 export class HeaderComponent {
   isLoggingOut = false;
+  notificacoesAbertas = false;
 
   constructor(
     public userState: UserStateService,
-    private authService: AuthService,
-    private router: Router
+    public notificacaoService: NotificacaoService
   ) {}
 
   get usuarioAtual() {
@@ -34,7 +36,39 @@ export class HeaderComponent {
         return 'Cooperativa';
 
       default:
-        return 'Sem perfil';
+        return 'Sem Perfil';
     }
   };
+
+  toggleNotificacoes(): void {
+    this.notificacoesAbertas = !this.notificacoesAbertas;
+  }
+
+  marcarComoLida(notificacao: Notificacao): void {
+    if (!notificacao.lida && notificacao.id) {
+      this.notificacaoService
+        .marcarComoLida(notificacao.id)
+        .catch((error) =>
+          console.error('Erro ao marcar notificação como lida:', error)
+        );
+    }
+
+    // Aqui você pode adicionar lógica para navegar para uma página específica
+    // dependendo do tipo de notificação
+    if (
+      notificacao.tipo === 'LOCAL_DISPONIVEL' &&
+      notificacao.dadosAdicionais?.localId
+    ) {
+      // Navegar para a página de detalhes do local ou outra ação
+      console.log('Navegar para local:', notificacao.dadosAdicionais.localId);
+    }
+  }
+
+  marcarTodasComoLidas(): void {
+    this.notificacaoService
+      .marcarTodasComoLidas()
+      .catch((error) =>
+        console.error('Erro ao marcar todas notificações como lidas:', error)
+      );
+  }
 }

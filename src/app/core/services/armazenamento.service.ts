@@ -23,7 +23,7 @@ import { FirebaseService } from './firebase.service';
   providedIn: 'root',
 })
 export class ArmazenamentoService {
-  private readonly COLECAO = 'locais_armazenamento';
+  private readonly LOCAIS_ARMAZENAMENTO = 'locais_armazenamento';
 
   constructor(private firebaseService: FirebaseService) {}
 
@@ -32,7 +32,7 @@ export class ArmazenamentoService {
    */
   obterLocaisArmazenamento(): Observable<LocalArmazenamento[]> {
     const firestore = this.firebaseService.getFirestore();
-    const locaisRef = collection(firestore, this.COLECAO);
+    const locaisRef = collection(firestore, this.LOCAIS_ARMAZENAMENTO);
 
     return new Observable<LocalArmazenamento[]>((observer) => {
       const unsubscribe = onSnapshot(
@@ -71,7 +71,7 @@ export class ArmazenamentoService {
     local: Omit<LocalArmazenamento, 'id' | 'createdAt' | 'updatedAt'>
   ): Observable<LocalArmazenamento> {
     const firestore = this.firebaseService.getFirestore();
-    const locaisRef = collection(firestore, this.COLECAO);
+    const locaisRef = collection(firestore, this.LOCAIS_ARMAZENAMENTO);
     const agora = Timestamp.now();
 
     const novoLocal = {
@@ -101,7 +101,7 @@ export class ArmazenamentoService {
     local: Partial<Omit<LocalArmazenamento, 'id' | 'createdAt'>>
   ): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const localRef = doc(firestore, this.COLECAO, id);
+    const localRef = doc(firestore, this.LOCAIS_ARMAZENAMENTO, id);
 
     const dadosAtualizados = {
       ...local,
@@ -116,7 +116,7 @@ export class ArmazenamentoService {
    */
   removerLocalArmazenamento(id: string): Observable<void> {
     const firestore = this.firebaseService.getFirestore();
-    const localRef = doc(firestore, this.COLECAO, id);
+    const localRef = doc(firestore, this.LOCAIS_ARMAZENAMENTO, id);
 
     return from(deleteDoc(localRef));
   }
